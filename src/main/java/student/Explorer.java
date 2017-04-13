@@ -4,9 +4,10 @@ import java.util.Collection;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.GameState;
 import game.NodeStatus;
 
-public class Explorer implements ExplorationState{
+public class Explorer {
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -41,30 +42,6 @@ public class Explorer implements ExplorationState{
   public void explore(ExplorationState state) {
     //TODO:
   }
-  @Override
-  public long getCurrentLocation() {
-	  //TODO:
-	  long x = 479274;
-	  return x;
-  }
-  
-  @Override
-  public Collection<NodeStatus> getNeighbours() {
-	  //TODO:
-	  Collection<NodeStatus> x = null;
-	  return x;
-  }
-  @Override
-  public int getDistanceToTarget() {
-	  //TODO:
-	  return 5;
-  }
-  
-  @Override
-  public void moveTo(long id) {
-	  //TODO:
-  }
-  
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
