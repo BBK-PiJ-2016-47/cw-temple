@@ -1,9 +1,12 @@
 package student;
 
+import java.util.Collection;
+
 import game.EscapeState;
 import game.ExplorationState;
+import game.NodeStatus;
 
-public class Explorer {
+public class Explorer implements ExplorationState{
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -37,6 +40,29 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     //TODO:
+  }
+  @Override
+  public long getCurrentLocation() {
+	  //TODO:
+	  long x = 479274;
+	  return x;
+  }
+  
+  @Override
+  public Collection<NodeStatus> getNeighbours() {
+	  //TODO:
+	  Collection<NodeStatus> x = null;
+	  return x;
+  }
+  @Override
+  public int getDistanceToTarget() {
+	  //TODO:
+	  return 5;
+  }
+  
+  @Override
+  public void moveTo(long id) {
+	  //TODO:
   }
   
 
