@@ -1,6 +1,10 @@
 package student;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import game.EscapeState;
 import game.ExplorationState;
@@ -41,6 +45,17 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     //TODO:
+	  while (state.getDistanceToTarget() == 0) {
+		  List<NodeStatus> neighbouringTiles = (LinkedList<NodeStatus>) state.getNeighbours();
+		  NodeStatus shortNeighbour = neighbouringTiles.get(0);
+		  
+		  for(int i = 1; i < neighbouringTiles.size(); i++) {
+			  NodeStatus compare = neighbouringTiles.get(i);
+			  if (compare.getDistanceToTarget() < shortNeighbour.getDistanceToTarget()) {
+				  shortNeighbour = compare;
+			  }
+		  }
+	  }
   }
 
   /**
