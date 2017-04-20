@@ -12,6 +12,10 @@ import game.GameState;
 import game.NodeStatus;
 
 public class Explorer {
+	
+	private List<NodeStatus> neighbouringTiles;
+	private NodeStatus currentNode;
+	private List<NodeStatus> visitedTiles;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -46,26 +50,37 @@ public class Explorer {
   public void explore(ExplorationState state) {
     //TODO:
 	  while (state.getDistanceToTarget() != 0) {
-		  List<NodeStatus> neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
+		  
 		  //using Dijkstra's algorithm
-		  List<NodeStatus> visitedTiles = new ArrayList();
+		  visitedTiles = new ArrayList();
 		  
-		  
+		  long currentLocation = state.getCurrentLocation();
+		  int distance = state.getDistanceToTarget();
 		  //finding tile with shortest distance to orb to move to
-		  boolean shorter = false;
-		  NodeStatus shortestNeighbour = neighbouringTiles.get(0);
-		  for(int i = 1; i < neighbouringTiles.size(); i++) {
-			  NodeStatus compare = neighbouringTiles.get(i);
-			  if (compare.compareTo(shortestNeighbour) < 0) {
-				  shortestNeighbour = compare;
-				  shorter = true;
-			  } else {
-				  //if there is not a tile closer to the orb
-			  }
+		  long shortestLocation = returnShortestNeighbour(state).getId();
+		  if (returnShortestNeighbour(state).getDistanceToTarget() < distance){
+			  state.moveTo(shortestLocation);
 		  }
-		  state.moveTo(shortestNeighbour.getId());
+		  
 	  }
 	  return;
+  }
+  
+  private NodeStatus returnShortestNeighbour(ExplorationState state) {
+	  neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
+	  
+	  NodeStatus shortestNeighbour = neighbouringTiles.get(0);
+	  for(int i = 1; i < neighbouringTiles.size(); i++) {
+		  NodeStatus compare = neighbouringTiles.get(i);
+		  if (!visitedTiles.contains(i)) {
+			  if (compare.compareTo(shortestNeighbour) < 0) {
+				  shortestNeighbour = compare;
+				  
+			  } 
+		  }
+		 
+	  }
+	  return shortestNeighbour;
   }
 
   /**
