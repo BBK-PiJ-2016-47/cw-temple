@@ -56,19 +56,22 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     //TODO:
+	  //do this in a separate method to find shortest route before 
+	  //finishing explore?
 	  while (state.getDistanceToTarget() != 0) {
 		  visitedTiles = new ArrayList();
 		  currentLocation = state.getCurrentLocation();
 		  int distance = state.getDistanceToTarget();
 		  //finding tile with shortest distance to orb to move to
 		  long shortestLocation = returnShortestNeighbour(state).getId();
-		  if (returnShortestNeighbour(state).getDistanceToTarget() < distance){
-			  //visitedTiles.add: how to add if using long not Node?
+		  NodeStatus shortestNeighbour = returnShortestNeighbour(state);
+		  if (shortestNeighbour.getDistanceToTarget() < distance){
 			  previousLocation = currentLocation;
 			  currentLocation = shortestLocation;
 			  state.moveTo(shortestLocation);
+			  visitedTiles.add(shortestNeighbour);
 		  } else {
-			  //move back a tile?
+			  state.moveTo(previousLocation);
 		  }
 		  
 	  }
@@ -79,9 +82,9 @@ public class Explorer {
 	  neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
 	  
 	  NodeStatus shortestNeighbour = neighbouringTiles.get(0);
-	  for(int i = 1; i < neighbouringTiles.size(); i++) {
-		  NodeStatus compare = neighbouringTiles.get(i);
-		  if (!visitedTiles.contains(i)) {
+	  for(NodeStatus n : neighbouringTiles) {
+		  NodeStatus compare = n;
+		  if (!visitedTiles.contains(n)) {
 			  if (compare.compareTo(shortestNeighbour) < 0) {
 				  shortestNeighbour = compare;
 				  
@@ -126,7 +129,7 @@ public class Explorer {
 		  //time == 1 step
 		  visitedEscapeTiles = new ArrayList<Node>();
 		  visitedEscapeTiles.add(currentNode);
-		  
+		  state.moveTo(???);
 		  
 	  }
   }
