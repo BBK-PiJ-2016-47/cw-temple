@@ -14,7 +14,10 @@ import game.NodeStatus;
 public class Explorer {
 	
 	private List<NodeStatus> neighbouringTiles;
+	private long currentLocation;
+	private long previousLocation;
 	private NodeStatus currentNode;
+	private NodeStatus previousNode;
 	private List<NodeStatus> visitedTiles;
 
   /**
@@ -50,16 +53,18 @@ public class Explorer {
   public void explore(ExplorationState state) {
     //TODO:
 	  while (state.getDistanceToTarget() != 0) {
-		  
-		  //using Dijkstra's algorithm
 		  visitedTiles = new ArrayList();
-		  
-		  long currentLocation = state.getCurrentLocation();
+		  currentLocation = state.getCurrentLocation();
 		  int distance = state.getDistanceToTarget();
 		  //finding tile with shortest distance to orb to move to
 		  long shortestLocation = returnShortestNeighbour(state).getId();
 		  if (returnShortestNeighbour(state).getDistanceToTarget() < distance){
+			  //visitedTiles.add: how to add if using long not Node?
+			  previousLocation = currentLocation;
+			  currentLocation = shortestLocation;
 			  state.moveTo(shortestLocation);
+		  } else {
+			  //move back a tile?
 		  }
 		  
 	  }
