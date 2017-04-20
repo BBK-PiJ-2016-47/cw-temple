@@ -9,16 +9,20 @@ import java.util.List;
 import game.EscapeState;
 import game.ExplorationState;
 import game.GameState;
+import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
 	
 	private List<NodeStatus> neighbouringTiles;
+	private List<Node> neighbouringEscapeTiles;
 	private long currentLocation;
 	private long previousLocation;
-	private NodeStatus currentNode;
+	private NodeStatus currentNodeStatus;
+	private Node currentNode;
 	private NodeStatus previousNode;
 	private List<NodeStatus> visitedTiles;
+	private List<Node> visitedEscapeTiles;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -114,5 +118,34 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
+	  
+	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
+		  currentNode = state.getCurrentNode();
+		  state.pickUpGold();
+		  //need to graph out the distance that maximises time
+		  //time == 1 step
+		  visitedEscapeTiles = new ArrayList<Node>();
+		  visitedEscapeTiles.add(currentNode);
+		  
+		  
+	  }
+  }
+  
+  private Node returnOptimumTile(EscapeState state) {
+	  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours();
+	  //need to graph out the best route by going through them all?
+	  //Or leave a buffer of 2 in time to allow for getting lost
+	  Node bestNeighbour = neighbouringEscapeTiles.get(0);
+	  for(int i = 1; i < neighbouringEscapeTiles.size(); i++) {
+		  Node compare = neighbouringEscapeTiles.get(i);
+		  if (!visitedEscapeTiles.contains(i)) {
+			  if (compare.compareTo(bestNeighbour) < 0) {
+				  bestNeighbour = compare;
+				  
+			  } 
+		  }
+		 
+	  }
+	  return shortestNeighbour;
   }
 }
