@@ -14,7 +14,7 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-    private List<NodeStatus> neighbouringTiles;
+    private List<TileNode> neighbouringTiles;
     private List<Node> neighbouringEscapeTiles;
     private long currentLocation;
     private long previousLocation;
@@ -58,14 +58,18 @@ public class Explorer {
     //do this in a separate method to find shortest route before
     //finishing explore? DFS traversal in graphimpl
     //use peek to see two squares ahead?
-	  Stack<TileNode> visitedTiles = new Stack<TileNode>();
+	  currentLocation = state.getCurrentLocation();
+	  int distance = state.getDistanceToTarget();
+	  TileNode current = new TileNode(currentLocation, true, distance);
+	  ExplorerGraph graph = new ExplorerGraph();
+	  List<TileNode> unvisitedTiles = graph.getUnvisitedNeighbours(current);
 	  
-    while (state.getDistanceToTarget() != 0) {
-      currentLocation = state.getCurrentLocation();
-      TileNode current = new TileNode(currentLocation, true);
+	  TileNode next = returnShortestNeighbour(unvisitedTiles);
+	  next.setVisited(true);
+	  state.moveTo(next.getId());
+	  
+   /* while (state.getDistanceToTarget() != 0) {
       visitedTiles.push(current);
-      
-      int distance = state.getDistanceToTarget();
       //finding tile with shortest distance to orb to move to
       long shortestLocation = returnShortestNeighbour(state).getId();
       NodeStatus shortestNeighbour = returnShortestNeighbour(state);
@@ -79,32 +83,21 @@ public class Explorer {
         //state.moveTo(previousLocation);
       //}
 
-    }
+    }*/
     return;
   }
-    private NodeStatus returnShortestNeighbour(ExplorationState state) {
-        neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
-        //remove visited tiles up here
-        for (int i = 0; i < neighbouringTiles.size(); i++) {
-            if (visitedTiles.contains(neighbouringTiles.get(i))) {
-                neighbouringTiles.remove(i);
-            }
-        }
-        NodeStatus shortestNeighbour = neighbouringTiles.get(0);
-
-        for(NodeStatus n : neighbouringTiles) {
-            NodeStatus compare = n;
-            //GUI is allowing sprite to go back a tile - doesn't work
-
-                if (compare.compareTo(shortestNeighbour) < 0) {
-                    shortestNeighbour = compare;
-
-                }
-
-
-        }
-        return shortestNeighbour;
+  private TileNode returnShortestNeighbour(List<TileNode> neighbours) {
+    TileNode shortestNeighbour = neighbours.get(0);
+    int shortestDistance = shortestNeighbour.getDistance();
+    for(TileNode n : neighbours) {
+      int distanceComparison = n.getDistance();
+      if (shortestDistance > distanceComparison) {
+        shortestNeighbour = n;
+        shortestDistance = distanceComparison;
+      }
     }
+    return shortestNeighbour;
+  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
@@ -145,7 +138,7 @@ public class Explorer {
 	  }*/
   }
   
-  private Node returnOptimumTile(EscapeState state) {
+/*  private Node returnOptimumTile(EscapeState state) {
 	  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours();
 	  //need to graph out the best route by going through them all?
 	  //Or leave a buffer of 2 in time to allow for getting lost
@@ -160,6 +153,6 @@ public class Explorer {
 		  }
 		 
 	  }
-	  return shortestNeighbour;
-  }
+	  return bestNeighbour;
+  }*/
 }
