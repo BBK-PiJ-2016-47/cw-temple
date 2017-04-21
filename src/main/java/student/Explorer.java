@@ -80,9 +80,9 @@ public class Explorer {
     private NodeStatus returnShortestNeighbour(ExplorationState state) {
         neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
         //remove visited tiles up here
-        for (NodeStatus n : neighbouringTiles) {
-            if (visitedTiles.contains(n)) {
-                neighbouringTiles.remove(n);
+        for (int i = 0; i < neighbouringTiles.size(); i++) {
+            if (visitedTiles.contains(neighbouringTiles.get(i))) {
+                neighbouringTiles.remove(i);
             }
         }
         NodeStatus shortestNeighbour = neighbouringTiles.get(0);
