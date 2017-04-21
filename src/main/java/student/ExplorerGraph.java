@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import searchexample.Node;
-
 public class ExplorerGraph {
   private final List<TileNode> tileNodes = new ArrayList<TileNode>();
   private final Map<TileNode, List<TileNode>> map = new ConcurrentHashMap<>();
@@ -14,38 +12,41 @@ public class ExplorerGraph {
   
   
   public TileNode getRootNode() {
-	  return rootNode;
+    return rootNode;
   }
   
   public void setRootNode(TileNode root) {
-	  this.rootNode = root;
+    this.rootNode = root;
   }
   
   public void addTileNode(TileNode node) {
-	  tileNodes.add(node);
+    tileNodes.add(node);
   }
   
   public void connectNode(final TileNode start, final TileNode end) {
-	  List<TileNode> nodeList = map.get(start);
-	    if (nodeList == null) {
-	      nodeList = new ArrayList<>();
-	    }
-	    map.put(start, nodeList);
-	    nodeList.add(end);
-	    }
+    List<TileNode> nodeList = map.get(start);
+      if (nodeList == null) {
+        nodeList = new ArrayList<>();
+      }
+    map.put(start, nodeList);
+    nodeList.add(end);
+  }
   
+  /* 
+   * returns an arraylist of neighbours that have not been visited
+   */
   public List<TileNode> getUnvisitedNeighbours(final TileNode node) {
-	    final List<TileNode> neighbours = map.get(node);
-	    final List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
-	    if (neighbours != null) {
-	      for (int i = 0; i < neighbours.size(); i++) {
-	        final TileNode temp = neighbours.get(i);
-	        if (!temp.getVisited()) {
-	          unvisitedNeighbours.add(temp);
-	        }
-	      }
-	    }
-	    return unvisitedNeighbours;
-	  }
+    final List<TileNode> neighbours = map.get(node);
+    final List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
+    if (neighbours != null) {
+      for (int i = 0; i < neighbours.size(); i++) {
+        final TileNode temp = neighbours.get(i);
+        if (!temp.getVisited()) {
+          unvisitedNeighbours.add(temp);
+        }
+      }
+    }
+    return unvisitedNeighbours;
+  }
   
 }
