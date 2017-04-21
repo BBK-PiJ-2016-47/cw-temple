@@ -1,8 +1,5 @@
 package student;
 
-import java.util.Set;
-
-import game.Tile;
 
 public class TileNode {
     /*
@@ -11,10 +8,12 @@ public class TileNode {
 
     private boolean visited;
     private long id;
+    private int distance;
 
-    TileNode(long id, boolean visited) {
+    public TileNode(long id, boolean visited, int distance) {
     	this.id = id;
     	this.visited = visited;
+    	this.distance = distance;
     }
     
     public boolean getVisited() {
@@ -27,6 +26,10 @@ public class TileNode {
     
     public long getId() {
     	return id;
+    }
+    
+    public int getDistance() {
+    	return distance;
     }
 
 }
