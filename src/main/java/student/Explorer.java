@@ -13,17 +13,15 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-	
-	private List<NodeStatus> neighbouringTiles;
-	private List<Node> neighbouringEscapeTiles;
-	private long currentLocation;
-	private long previousLocation;
-	private NodeStatus currentNodeStatus;
-	private Node currentNode;
-	private NodeStatus previousNode;
-	private List<NodeStatus> visitedTiles;
-	private List<Node> visitedEscapeTiles;
-
+    private List<NodeStatus> neighbouringTiles;
+    private List<Node> neighbouringEscapeTiles;
+    private long currentLocation;
+    private long previousLocation;
+    private NodeStatus currentNodeStatus;
+    private Node currentNode;
+    private NodeStatus previousNode;
+    private List<NodeStatus> visitedTiles;
+    private List<Node> visitedEscapeTiles;
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
    * Once you find the orb, you must return from the function in order to pick
@@ -56,44 +54,52 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     //TODO:
-	  //do this in a separate method to find shortest route before 
-	  //finishing explore?
-	  while (state.getDistanceToTarget() != 0) {
-		  visitedTiles = new ArrayList();
-		  currentLocation = state.getCurrentLocation();
-		  int distance = state.getDistanceToTarget();
-		  //finding tile with shortest distance to orb to move to
-		  long shortestLocation = returnShortestNeighbour(state).getId();
-		  NodeStatus shortestNeighbour = returnShortestNeighbour(state);
-		  if (shortestNeighbour.getDistanceToTarget() < distance){
-			  previousLocation = currentLocation;
-			  currentLocation = shortestLocation;
-			  state.moveTo(shortestLocation);
-			  visitedTiles.add(shortestNeighbour);
-		  } else {
-			  state.moveTo(previousLocation);
-		  }
-		  
-	  }
-	  return;
+    //do this in a separate method to find shortest route before
+    //finishing explore? DFS traversal in graphimpl
+    //use peek to see two squares ahead?
+    while (state.getDistanceToTarget() != 0) {
+      visitedTiles = new ArrayList();
+      currentLocation = state.getCurrentLocation();
+      int distance = state.getDistanceToTarget();
+      //finding tile with shortest distance to orb to move to
+      long shortestLocation = returnShortestNeighbour(state).getId();
+      NodeStatus shortestNeighbour = returnShortestNeighbour(state);
+      //if (shortestNeighbour.getDistanceToTarget() <= distance){
+        previousLocation = currentLocation;
+        currentLocation = shortestLocation;
+        state.moveTo(shortestLocation);
+        visitedTiles.add(shortestNeighbour);
+     // }
+       //       else {
+        //state.moveTo(previousLocation);
+      //}
+
+    }
+    return;
   }
-  
-  private NodeStatus returnShortestNeighbour(ExplorationState state) {
-	  neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
-	  
-	  NodeStatus shortestNeighbour = neighbouringTiles.get(0);
-	  for(NodeStatus n : neighbouringTiles) {
-		  NodeStatus compare = n;
-		  if (!visitedTiles.contains(n)) {
-			  if (compare.compareTo(shortestNeighbour) < 0) {
-				  shortestNeighbour = compare;
-				  
-			  } 
-		  }
-		 
-	  }
-	  return shortestNeighbour;
-  }
+    private NodeStatus returnShortestNeighbour(ExplorationState state) {
+        neighbouringTiles = (ArrayList<NodeStatus>) state.getNeighbours();
+        //remove visited tiles up here
+        for (NodeStatus n : neighbouringTiles) {
+            if (visitedTiles.contains(n)) {
+                neighbouringTiles.remove(n);
+            }
+        }
+        NodeStatus shortestNeighbour = neighbouringTiles.get(0);
+
+        for(NodeStatus n : neighbouringTiles) {
+            NodeStatus compare = n;
+            //GUI is allowing sprite to go back a tile - doesn't work
+
+                if (compare.compareTo(shortestNeighbour) < 0) {
+                    shortestNeighbour = compare;
+
+                }
+
+
+        }
+        return shortestNeighbour;
+    }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
