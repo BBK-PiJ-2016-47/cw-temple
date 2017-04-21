@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import game.EscapeState;
 import game.ExplorationState;
@@ -57,9 +58,13 @@ public class Explorer {
     //do this in a separate method to find shortest route before
     //finishing explore? DFS traversal in graphimpl
     //use peek to see two squares ahead?
+	  Stack<TileNode> visitedTiles = new Stack<TileNode>();
+	  
     while (state.getDistanceToTarget() != 0) {
-      visitedTiles = new ArrayList();
       currentLocation = state.getCurrentLocation();
+      TileNode current = new TileNode(currentLocation, true);
+      visitedTiles.push(current);
+      
       int distance = state.getDistanceToTarget();
       //finding tile with shortest distance to orb to move to
       long shortestLocation = returnShortestNeighbour(state).getId();
@@ -127,7 +132,7 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
-	  
+	/*  
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
 		  currentNode = state.getCurrentNode();
 		  state.pickUpGold();
@@ -137,7 +142,7 @@ public class Explorer {
 		  visitedEscapeTiles.add(currentNode);
 		  state.moveTo(???);
 		  
-	  }
+	  }*/
   }
   
   private Node returnOptimumTile(EscapeState state) {
