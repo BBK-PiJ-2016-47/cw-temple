@@ -34,17 +34,18 @@ public class ExplorerGraph {
 	    nodeList.add(end);
 	    }
   
-  public TileNode getUnvisitedChildNode(final TileNode node) {
-	    final List<TileNode> nodeList = map.get(node);
-	    if (nodeList != null) {
-	      for (int i = 0; i < nodeList.size(); i++) {
-	        final TileNode temp = nodeList.get(i);
+  public List<TileNode> getUnvisitedNeighbours(final TileNode node) {
+	    final List<TileNode> neighbours = map.get(node);
+	    final List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
+	    if (neighbours != null) {
+	      for (int i = 0; i < neighbours.size(); i++) {
+	        final TileNode temp = neighbours.get(i);
 	        if (!temp.getVisited()) {
-	          return temp;
+	          unvisitedNeighbours.add(temp);
 	        }
 	      }
 	    }
-	    return null;
+	    return unvisitedNeighbours;
 	  }
   
 }
