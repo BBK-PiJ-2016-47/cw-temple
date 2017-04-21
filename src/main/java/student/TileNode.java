@@ -12,9 +12,9 @@ public class TileNode {
     private boolean visited;
     private long id;
 
-    TileNode(long id, Tile tile) {
+    TileNode(long id, boolean visited) {
     	this.id = id;
-    	visited = false;
+    	this.visited = visited;
     }
     
     public boolean getVisited() {
