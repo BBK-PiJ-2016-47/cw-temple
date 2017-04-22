@@ -16,7 +16,7 @@ import game.NodeStatus;
 public class Explorer {
   private List<NodeStatus> neighbouringTiles;
   private NodeStatus previousNode;
-  private List<Long> visitedTiles;
+  private Stack<Long> visitedTiles;
   private long currentLocation;
   private long previousLocation;
   private NodeStatus currentNodeStatus;
@@ -57,15 +57,18 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     //TODO: can still get stuck if goes wrong way in first place - make method to retrace steps?
-	visitedTiles = new ArrayList<Long>();
+	visitedTiles = new Stack<Long>();
 	while (state.getDistanceToTarget() != 0) {
       unvisitedTiles = new ArrayList<>();
 	  currentLocation = state.getCurrentLocation();
 	  neighbouringTiles = (List<NodeStatus>) state.getNeighbours();
 	  unvisitedTiles = getUnvisitedNeighbours(neighbouringTiles);
-	  visitedTiles.add(currentLocation);
+	  visitedTiles.push(currentLocation);
 	  if (unvisitedTiles.isEmpty()){
+		//can retrace path with visited tiles - turn into stack to pop them off??
 	    state.moveTo(previousLocation);
+		visitedTiles.pop();
+		previousLocation = visitedTiles.peek();
 	  } else {
 		NodeStatus next = returnShortestNeighbour(unvisitedTiles);
 	    previousLocation = currentLocation;
