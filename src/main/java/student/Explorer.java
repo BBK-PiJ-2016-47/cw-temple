@@ -133,6 +133,7 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
+	  visitedEscapeTiles = new ArrayList<Node>();
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
 		  unvisitedEscapeTiles = new ArrayList<Node>();
 		  currentNode = state.getCurrentNode();
@@ -141,6 +142,7 @@ public class Explorer {
 		  }
 		  neighbouringEscapeTiles = new ArrayList<Node>(currentNode.getNeighbours()); 
 		  unvisitedEscapeTiles = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
+		  visitedEscapeTiles.add(currentNode);
 	  }
 	/*  
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
@@ -148,8 +150,6 @@ public class Explorer {
 		  state.pickUpGold();
 		  //need to graph out the distance that maximises time
 		  //time == 1 step
-		  visitedEscapeTiles = new ArrayList<Node>();
-		  visitedEscapeTiles.add(currentNode);
 		  state.moveTo(???);
 		  
 	  }*/
@@ -166,21 +166,17 @@ public class Explorer {
     return unvisitedEscapeTiles;
   }
 
-/*  private Node returnOptimumTile(EscapeState state) {
-	  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours();
-	  //need to graph out the best route by going through them all?
-	  //Or leave a buffer of 2 in time to allow for getting lost
-	  Node bestNeighbour = neighbouringEscapeTiles.get(0);
-	  for(int i = 1; i < neighbouringEscapeTiles.size(); i++) {
-		  Node compare = neighbouringEscapeTiles.get(i);
-		  if (!visitedEscapeTiles.contains(i)) {
-			  if (compare.compareTo(bestNeighbour) < 0) {
-				  bestNeighbour = compare;
-				  
-			  } 
-		  }
-		 
-	  }
-	  return bestNeighbour;
-  }*/
+  private Node returnOptimumTile(List<Node> neighbours) {
+    //need to graph out the best route by going through them all?
+	//Or leave a buffer of 2 in time to allow for getting lost
+	Node bestNeighbour = neighbours.get(0);
+	List<Node> nodesWithGold = new ArrayList<Node>();
+    //checking which neighbours have gold but also need to know distance too right?
+    for(Node n : neighbours) {
+      if (n.getTile().getGold() > 0) {
+        nodesWithGold.add(n);
+      }
+    }
+	return bestNeighbour;
+  }
 }
