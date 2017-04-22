@@ -133,6 +133,16 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
+	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
+		  neighbouringEscapeTiles = new ArrayList<Node>();
+		  unvisitedEscapeTiles = new ArrayList<Node>();
+		  currentNode = state.getCurrentNode();
+		  if(state.getCurrentNode().getTile().getGold() > 0){
+			  state.pickUpGold(); 
+		  }
+		  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours(); 
+		  unvisitedEscapeTiles = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
+	  }
 	/*  
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
 		  currentNode = state.getCurrentNode();
