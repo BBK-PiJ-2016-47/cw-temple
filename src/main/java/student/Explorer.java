@@ -19,9 +19,9 @@ public class Explorer {
   private long currentLocation;
   private long previousLocation;
   private List<NodeStatus> unvisitedTiles;
-    
-  private List<Node> unvisitedEscapeTiles;
-  private List<Node> visitedEscapeTiles;
+  
+  private List<Long> visitedEscapeTiles = new ArrayList<Long>();
+  private List<Node> unvisitedEscapeNodes;
   private List<Node> neighbouringEscapeTiles;
   private Node currentNode;
 
@@ -133,16 +133,16 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
-	  visitedEscapeTiles = new ArrayList<Node>();
+	  visitedEscapeTiles = new ArrayList<Long>();
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-		  unvisitedEscapeTiles = new ArrayList<Node>();
+		  unvisitedEscapeNodes = new ArrayList<Node>();
 		  currentNode = state.getCurrentNode();
 		  if(state.getCurrentNode().getTile().getGold() > 0){
 			  state.pickUpGold(); 
 		  }
 		  neighbouringEscapeTiles = new ArrayList<Node>(currentNode.getNeighbours()); 
-		  unvisitedEscapeTiles = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
-		  visitedEscapeTiles.add(currentNode);
+		  unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
+		  visitedEscapeTiles.add(currentNode.getId());
 	  }
 	/*  
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
@@ -160,10 +160,10 @@ public class Explorer {
       Node temp = neighbours.get(i);
       //a null pointer exception is being thrown here
       if (!visitedEscapeTiles.contains(temp.getId())) {
-        unvisitedEscapeTiles.add(temp);
+    	  unvisitedEscapeNodes.add(temp);
       }
     }
-    return unvisitedEscapeTiles;
+    return unvisitedEscapeNodes;
   }
 
   private Node returnOptimumTile(List<Node> neighbours) {
