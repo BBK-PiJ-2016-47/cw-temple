@@ -14,15 +14,15 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-  private List<NodeStatus> neighbouringTiles;
+  private List<NodeStatus> neighbouringNodeStatuses;
   private Stack<Long> visitedTiles;
   private long currentLocation;
   private long previousLocation;
-  private List<NodeStatus> unvisitedTiles;
+  private List<NodeStatus> unvisitedNodeStatuses;
   
   private List<Long> visitedEscapeTiles = new ArrayList<Long>();
   private List<Node> unvisitedEscapeNodes;
-  private List<Node> neighbouringEscapeTiles;
+  private List<Node> neighbouringEscapeNodes;
   private Node currentNode;
 
   /**
@@ -58,19 +58,19 @@ public class Explorer {
   public void explore(ExplorationState state) {
 	visitedTiles = new Stack<Long>();
 	while (state.getDistanceToTarget() != 0) {
-      unvisitedTiles = new ArrayList<>();
+		unvisitedNodeStatuses = new ArrayList<>();
 	  currentLocation = state.getCurrentLocation();
-	  neighbouringTiles = (List<NodeStatus>) state.getNeighbours();
-	  unvisitedTiles = getUnvisitedNeighbours(neighbouringTiles);
+	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
+	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
 	  visitedTiles.push(currentLocation);
-	  if (unvisitedTiles.isEmpty()){
+	  if (unvisitedNodeStatuses.isEmpty()){
 	    state.moveTo(previousLocation);
 	    Stack<Long> temp = visitedTiles;
 		temp.pop();
 		temp.pop();
 		previousLocation = temp.peek();
 	  } else {
-		NodeStatus next = returnShortestNeighbour(unvisitedTiles);
+		NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
 	    previousLocation = currentLocation;
 	    state.moveTo(next.getId());
 	  }
@@ -101,10 +101,10 @@ public class Explorer {
     for (int i = 0; i < neighbours.size(); i++) {
       NodeStatus temp = neighbours.get(i);
       if (!visitedTiles.contains(temp.getId())) {
-        unvisitedTiles.add(temp);
+    	  unvisitedNodeStatuses.add(temp);
       }
     }
-    return unvisitedTiles;
+    return unvisitedNodeStatuses;
   }
 
   /**
@@ -140,8 +140,8 @@ public class Explorer {
 		  if(state.getCurrentNode().getTile().getGold() > 0){
 			  state.pickUpGold(); 
 		  }
-		  neighbouringEscapeTiles = new ArrayList<Node>(currentNode.getNeighbours()); 
-		  unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
+		  neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
+		  unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
 		  visitedEscapeTiles.add(currentNode.getId());
 	  }
 	/*  
