@@ -15,13 +15,13 @@ import game.NodeStatus;
 
 public class Explorer {
   private List<NodeStatus> neighbouringTiles;
-  private NodeStatus previousNode;
   private Stack<Long> visitedTiles;
   private long currentLocation;
   private long previousLocation;
-  private NodeStatus currentNodeStatus;
   private List<NodeStatus> unvisitedTiles;
     
+  private List<Node> unvisitedEscapeTiles;
+  private List<Node> visitedEscapeTiles;
   private List<Node> neighbouringEscapeTiles;
   private Node currentNode;
 
@@ -146,6 +146,15 @@ public class Explorer {
 	  }*/
   }
   
+    for (int i = 0; i < neighbours.size(); i++) {
+      Node temp = neighbours.get(i);
+      if (!visitedEscapeTiles.contains(temp.getId())) {
+        unvisitedEscapeTiles.add(temp);
+      }
+    }
+    return unvisitedEscapeTiles;
+  }
+
 /*  private Node returnOptimumTile(EscapeState state) {
 	  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours();
 	  //need to graph out the best route by going through them all?
