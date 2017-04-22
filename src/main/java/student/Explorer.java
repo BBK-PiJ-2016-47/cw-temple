@@ -146,6 +146,7 @@ public class Explorer {
 	  }*/
   }
   
+  private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
     for (int i = 0; i < neighbours.size(); i++) {
       Node temp = neighbours.get(i);
       if (!visitedEscapeTiles.contains(temp.getId())) {
