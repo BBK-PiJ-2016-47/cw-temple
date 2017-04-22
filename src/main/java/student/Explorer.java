@@ -14,12 +14,16 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
+  //variables for explore method
   private List<NodeStatus> neighbouringNodeStatuses;
   private Stack<Long> visitedTiles;
   private long currentLocation;
   private long previousLocation;
   private List<NodeStatus> unvisitedNodeStatuses;
+//list of nodestatuses whose neighbours have no unvisited nodes left
+  private List<Long> usedNodeStatuses = new ArrayList<Long>();
   
+  //variables for escape method
   private List<Long> visitedEscapeTiles = new ArrayList<Long>();
   private List<Node> unvisitedEscapeNodes;
   private List<Node> neighbouringEscapeNodes;
@@ -58,12 +62,15 @@ public class Explorer {
   public void explore(ExplorationState state) {
 	visitedTiles = new Stack<Long>();
 	while (state.getDistanceToTarget() != 0) {
-		unvisitedNodeStatuses = new ArrayList<>();
+	  unvisitedNodeStatuses = new ArrayList<>();
 	  currentLocation = state.getCurrentLocation();
 	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
 	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
 	  visitedTiles.push(currentLocation);
 	  if (unvisitedNodeStatuses.isEmpty()){
+		//using this list to filter out nodes to never return to
+		//need to update relevant filter methods still
+        usedNodeStatuses.add(currentLocation);
 	    state.moveTo(previousLocation);
 	    Stack<Long> temp = visitedTiles;
 		temp.pop();
