@@ -58,32 +58,21 @@ public class Explorer {
     //do this in a separate method to find shortest route before
     //finishing explore? DFS traversal in graphimpl
     //use peek to see two squares ahead?
+	while (state.getDistanceToTarget() != 0) {
 	  currentLocation = state.getCurrentLocation();
 	  int distance = state.getDistanceToTarget();
 	  TileNode current = new TileNode(currentLocation, true, distance);
 	  ExplorerGraph graph = new ExplorerGraph();
 	  List<TileNode> unvisitedTiles = graph.getUnvisitedNeighbours(current);
-	  
-	  TileNode next = returnShortestNeighbour(unvisitedTiles);
-	  next.setVisited(true);
-	  state.moveTo(next.getId());
-	  
-   /* while (state.getDistanceToTarget() != 0) {
-      visitedTiles.push(current);
-      //finding tile with shortest distance to orb to move to
-      long shortestLocation = returnShortestNeighbour(state).getId();
-      NodeStatus shortestNeighbour = returnShortestNeighbour(state);
-      //if (shortestNeighbour.getDistanceToTarget() <= distance){
-        previousLocation = currentLocation;
-        currentLocation = shortestLocation;
-        state.moveTo(shortestLocation);
-        visitedTiles.add(shortestNeighbour);
-     // }
-       //       else {
-        //state.moveTo(previousLocation);
-      //}
-
-    }*/
+	  if (unvisitedTiles.isEmpty()){
+		  state.moveTo(previousLocation);
+	  } else {
+	    TileNode next = returnShortestNeighbour(unvisitedTiles);
+	    next.setVisited(true);
+	    previousLocation = currentLocation;
+	    state.moveTo(next.getId());
+	  }
+	}
     return;
   }
   private TileNode returnShortestNeighbour(List<TileNode> neighbours) {
