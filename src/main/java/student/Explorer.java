@@ -56,7 +56,6 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    //TODO: can still get stuck if goes wrong way in first place - make method to retrace steps?
 	visitedTiles = new Stack<Long>();
 	while (state.getDistanceToTarget() != 0) {
       unvisitedTiles = new ArrayList<>();
@@ -65,10 +64,11 @@ public class Explorer {
 	  unvisitedTiles = getUnvisitedNeighbours(neighbouringTiles);
 	  visitedTiles.push(currentLocation);
 	  if (unvisitedTiles.isEmpty()){
-		//can retrace path with visited tiles - turn into stack to pop them off??
 	    state.moveTo(previousLocation);
-		visitedTiles.pop();
-		previousLocation = visitedTiles.peek();
+	    Stack<Long> temp = visitedTiles;
+		temp.pop();
+		temp.pop();
+		previousLocation = temp.peek();
 	  } else {
 		NodeStatus next = returnShortestNeighbour(unvisitedTiles);
 	    previousLocation = currentLocation;
@@ -78,6 +78,9 @@ public class Explorer {
     return;
   }
   
+  /*
+   *TODO: javadoc
+   */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
     NodeStatus shortestNeighbour = neighbours.get(0);
     int shortestDistance = shortestNeighbour.getDistanceToTarget();
@@ -91,9 +94,12 @@ public class Explorer {
     return shortestNeighbour;
   }
   
+  /*
+   * TODO: javadoc
+   */
   public List<NodeStatus> getUnvisitedNeighbours(List<NodeStatus> neighbours) {
     for (int i = 0; i < neighbours.size(); i++) {
-      final NodeStatus temp = neighbours.get(i);
+      NodeStatus temp = neighbours.get(i);
       if (!visitedTiles.contains(temp.getId())) {
         unvisitedTiles.add(temp);
       }
