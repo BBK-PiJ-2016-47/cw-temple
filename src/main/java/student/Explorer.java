@@ -20,7 +20,7 @@ public class Explorer {
   private long currentLocation;
   private long previousLocation;
   private NodeStatus currentNodeStatus;
-  private List<NodeStatus> unvisitedTiles = new ArrayList<>();
+  private List<NodeStatus> unvisitedTiles;
     
   private List<Node> neighbouringEscapeTiles;
   private Node currentNode;
@@ -56,24 +56,18 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    //TODO:
-    //do this in a separate method to find shortest route before
-    //finishing explore? DFS traversal in graphimpl
-    //use peek to see two squares ahead?
+    //TODO: can still get stuck if goes wrong way in first place - make method to retrace steps?
 	visitedTiles = new ArrayList<Long>();
 	while (state.getDistanceToTarget() != 0) {
+      unvisitedTiles = new ArrayList<>();
 	  currentLocation = state.getCurrentLocation();
-	  int distance = state.getDistanceToTarget();
 	  neighbouringTiles = (List<NodeStatus>) state.getNeighbours();
-	  //TileNode current = new TileNode(currentLocation, true, distance);
-	  //ExplorerGraph graph = new ExplorerGraph();
 	  unvisitedTiles = getUnvisitedNeighbours(neighbouringTiles);
 	  visitedTiles.add(currentLocation);
 	  if (unvisitedTiles.isEmpty()){
 	    state.moveTo(previousLocation);
 	  } else {
 		NodeStatus next = returnShortestNeighbour(unvisitedTiles);
-	    //next.setVisited(true);
 	    previousLocation = currentLocation;
 	    state.moveTo(next.getId());
 	  }
