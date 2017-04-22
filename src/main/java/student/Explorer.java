@@ -134,13 +134,12 @@ public class Explorer {
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-		  neighbouringEscapeTiles = new ArrayList<Node>();
 		  unvisitedEscapeTiles = new ArrayList<Node>();
 		  currentNode = state.getCurrentNode();
 		  if(state.getCurrentNode().getTile().getGold() > 0){
 			  state.pickUpGold(); 
 		  }
-		  neighbouringEscapeTiles = (List<Node>) currentNode.getNeighbours(); 
+		  neighbouringEscapeTiles = new ArrayList<Node>(currentNode.getNeighbours()); 
 		  unvisitedEscapeTiles = returnUnvisitedEscapeNeighbours(neighbouringEscapeTiles);
 	  }
 	/*  
@@ -159,6 +158,7 @@ public class Explorer {
   private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
     for (int i = 0; i < neighbours.size(); i++) {
       Node temp = neighbours.get(i);
+      //a null pointer exception is being thrown here
       if (!visitedEscapeTiles.contains(temp.getId())) {
         unvisitedEscapeTiles.add(temp);
       }
