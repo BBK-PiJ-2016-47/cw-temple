@@ -14,15 +14,17 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-    private List<TileNode> neighbouringTiles;
-    private List<Node> neighbouringEscapeTiles;
-    private long currentLocation;
-    private long previousLocation;
-    private NodeStatus currentNodeStatus;
-    private Node currentNode;
-    private NodeStatus previousNode;
-    private List<NodeStatus> visitedTiles;
-    private List<Node> visitedEscapeTiles;
+  private List<NodeStatus> neighbouringTiles;
+  private NodeStatus previousNode;
+  private List<Long> visitedTiles;
+  private long currentLocation;
+  private long previousLocation;
+  private NodeStatus currentNodeStatus;
+  private List<NodeStatus> unvisitedTiles = new ArrayList<>();
+    
+  private List<Node> neighbouringEscapeTiles;
+  private Node currentNode;
+
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
    * Once you find the orb, you must return from the function in order to pick
@@ -58,34 +60,48 @@ public class Explorer {
     //do this in a separate method to find shortest route before
     //finishing explore? DFS traversal in graphimpl
     //use peek to see two squares ahead?
+	visitedTiles = new ArrayList<Long>();
 	while (state.getDistanceToTarget() != 0) {
 	  currentLocation = state.getCurrentLocation();
 	  int distance = state.getDistanceToTarget();
-	  TileNode current = new TileNode(currentLocation, true, distance);
-	  ExplorerGraph graph = new ExplorerGraph();
-	  List<TileNode> unvisitedTiles = graph.getUnvisitedNeighbours(current);
+	  neighbouringTiles = (List<NodeStatus>) state.getNeighbours();
+	  //TileNode current = new TileNode(currentLocation, true, distance);
+	  //ExplorerGraph graph = new ExplorerGraph();
+	  unvisitedTiles = getUnvisitedNeighbours(neighbouringTiles);
+	  visitedTiles.add(currentLocation);
 	  if (unvisitedTiles.isEmpty()){
-		  state.moveTo(previousLocation);
+	    state.moveTo(previousLocation);
 	  } else {
-	    TileNode next = returnShortestNeighbour(unvisitedTiles);
-	    next.setVisited(true);
+		NodeStatus next = returnShortestNeighbour(unvisitedTiles);
+	    //next.setVisited(true);
 	    previousLocation = currentLocation;
 	    state.moveTo(next.getId());
 	  }
 	}
     return;
   }
-  private TileNode returnShortestNeighbour(List<TileNode> neighbours) {
-    TileNode shortestNeighbour = neighbours.get(0);
-    int shortestDistance = shortestNeighbour.getDistance();
-    for(TileNode n : neighbours) {
-      int distanceComparison = n.getDistance();
+  
+  private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
+    NodeStatus shortestNeighbour = neighbours.get(0);
+    int shortestDistance = shortestNeighbour.getDistanceToTarget();
+    for(NodeStatus n : neighbours) {
+      int distanceComparison = n.getDistanceToTarget();
       if (shortestDistance > distanceComparison) {
         shortestNeighbour = n;
         shortestDistance = distanceComparison;
       }
     }
     return shortestNeighbour;
+  }
+  
+  public List<NodeStatus> getUnvisitedNeighbours(List<NodeStatus> neighbours) {
+    for (int i = 0; i < neighbours.size(); i++) {
+      final NodeStatus temp = neighbours.get(i);
+      if (!visitedTiles.contains(temp.getId())) {
+        unvisitedTiles.add(temp);
+      }
+    }
+    return unvisitedTiles;
   }
 
   /**
