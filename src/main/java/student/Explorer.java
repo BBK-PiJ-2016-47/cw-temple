@@ -67,6 +67,22 @@ public class Explorer {
 	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
 	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
 	  visitedTiles.push(currentLocation);
+	  
+	  if (unvisitedNodeStatuses.isEmpty()) {
+		  usedNodeStatuses.add(currentLocation);
+	  }
+	  
+	  if (usedNodeStatuses.contains(currentLocation)) {
+		  state.moveTo(previousLocation);
+		  visitedTiles.pop();
+		  visitedTiles.pop();
+		  previousLocation = visitedTiles.peek();
+	  } else {
+	      NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
+		  previousLocation = currentLocation;
+		  state.moveTo(next.getId());
+	  }
+	  /*
 	  if (unvisitedNodeStatuses.isEmpty()){
 		//using this list to filter out nodes to never return to
 		//need to update relevant filter methods still
@@ -80,13 +96,14 @@ public class Explorer {
 		NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
 	    previousLocation = currentLocation;
 	    state.moveTo(next.getId());
-	  }
+	  }*/
 	}
     return;
   }
   
-  /*
-   *TODO: javadoc
+  /**
+   *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
+   *  @param neighbours - the list of unvisited neighbours to the current node
    */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
     NodeStatus shortestNeighbour = neighbours.get(0);
@@ -101,8 +118,10 @@ public class Explorer {
     return shortestNeighbour;
   }
   
-  /*
-   * TODO: javadoc
+  /**
+   *  Returns the list of NodeStatuses of the neighbours to the current location
+   *  that have not yet been visited
+   *  @param neighbours - the list of neighbours to the current node
    */
   public List<NodeStatus> getUnvisitedNeighbours(List<NodeStatus> neighbours) {
     for (int i = 0; i < neighbours.size(); i++) {
@@ -153,8 +172,7 @@ public class Explorer {
 	  }
 	/*  
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-		  currentNode = state.getCurrentNode();
-		  state.pickUpGold();
+
 		  //need to graph out the distance that maximises time
 		  //time == 1 step
 		  state.moveTo(???);
