@@ -15,13 +15,12 @@ import game.NodeStatus;
 
 public class Explorer {
   //variables for explore method
-  private List<NodeStatus> neighbouringNodeStatuses;
-  private Stack<Long> visitedTiles;
-  private long currentLocation;
+  private long currentLocation; 
   private long previousLocation;
-  private List<NodeStatus> unvisitedNodeStatuses;
-//list of nodestatuses whose neighbours have no unvisited nodes left
-  private List<Long> usedNodeStatuses = new ArrayList<Long>();
+  private List<NodeStatus> neighbouringNodeStatuses = new ArrayList<NodeStatus>(); //list of NodeStatus' neighbours
+  private Stack<Long> visitedTiles = new Stack<Long>(); //stack of IDs that have been visited
+  private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours who've not been visited
+  private List<Long> usedNodeStatuses = new ArrayList<Long>(); //list of nodestatuses whose neighbours have no unvisited nodes left
   
   //variables for escape method
   private List<Long> visitedEscapeTiles = new ArrayList<Long>();
@@ -60,24 +59,39 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-	visitedTiles = new Stack<Long>();
+	
 	while (state.getDistanceToTarget() != 0) {
 	  unvisitedNodeStatuses = new ArrayList<>();
 	  currentLocation = state.getCurrentLocation();
+	  //getting list of current location's neighbours
 	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
+	  //filtering current location's neighbours into those that haven't been visited
 	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
-	  visitedTiles.push(currentLocation);
 	  
+	  
+	  /*
+	   * if there are no neighbours that have not been visited, put Node in the usedNodeStatuses
+	   * list so that it can never get revisited
+	   */
 	  if (unvisitedNodeStatuses.isEmpty()) {
 		  usedNodeStatuses.add(currentLocation);
 	  }
 	  
+	  /*
+	   * if the location moved to becomes used, move to previous location, then move the current and previous location 
+	   * off the stack and put the top of the stack as the previous
+	   */
 	  if (usedNodeStatuses.contains(currentLocation)) {
+		  Stack<Long> temp = visitedTiles;
 		  state.moveTo(previousLocation);
-		  visitedTiles.pop();
-		  visitedTiles.pop();
-		  previousLocation = visitedTiles.peek();
+		  temp.pop();
+		  previousLocation = temp.peek();
 	  } else {
+		  /*
+		   * if the location is not used up, then find the unvisited neighbour with the shortest
+		   * difference to orb and move to it, and update previous location
+		   */
+		  visitedTiles.push(currentLocation);
 	      NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
 		  previousLocation = currentLocation;
 		  state.moveTo(next.getId());
