@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.ThreadLocalRandom;
 
 import game.EscapeState;
 import game.ExplorationState;
@@ -23,10 +24,11 @@ public class Explorer {
   private List<Long> usedNodeStatuses = new ArrayList<Long>(); //list of nodestatuses whose neighbours have no unvisited nodes left
   
   //variables for escape method
-  private List<Long> visitedEscapeTiles = new ArrayList<Long>();
+  private List<Node> visitedEscapeNodes = new ArrayList<Node>();
   private List<Node> unvisitedEscapeNodes;
   private List<Node> neighbouringEscapeNodes;
   private Node currentNode;
+  private Node previousNode;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -173,32 +175,44 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
-	  visitedEscapeTiles = new ArrayList<Long>();
+	  visitedEscapeNodes = new ArrayList<Node>();
 	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
 		  unvisitedEscapeNodes = new ArrayList<Node>();
 		  currentNode = state.getCurrentNode();
+		  //pick up gold without throwing an exception
 		  if(state.getCurrentNode().getTile().getGold() > 0){
 			  state.pickUpGold(); 
 		  }
 		  neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
 		  unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
-		  visitedEscapeTiles.add(currentNode.getId());
-	  }
-	/*  
-	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-
-		  //need to graph out the distance that maximises time
-		  //time == 1 step
-		  state.moveTo(???);
+		  visitedEscapeNodes.add(currentNode);
 		  
-	  }*/
+		  if(!unvisitedEscapeNodes.isEmpty()) {
+			  int size = unvisitedEscapeNodes.size();
+			  //generating a random number for the next tile
+			  int randomNum = ThreadLocalRandom.current().nextInt(0, size);
+			  state.moveTo(unvisitedEscapeNodes.get(randomNum));
+		  } else {
+			  Node previousTile = visitedEscapeNodes.get(visitedEscapeNodes.size()-1);
+              state.moveTo(previousTile);
+              visitedEscapeNodes = new ArrayList<Node>();
+		  }
+		  
+	  }
+	  return;
   }
+  
+  /**
+   * Finds a list of unvisited nodes to collect gold from
+   * 
+   * @param neighbours list of neighbour nodes
+   * @return list of unvisited neighbour nodes
+   */
   
   private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
     for (int i = 0; i < neighbours.size(); i++) {
       Node temp = neighbours.get(i);
-      //a null pointer exception is being thrown here
-      if (!visitedEscapeTiles.contains(temp.getId())) {
+      if (!visitedEscapeNodes.contains(temp)) {
     	  unvisitedEscapeNodes.add(temp);
       }
     }
