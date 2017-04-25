@@ -25,9 +25,9 @@ public class ExplorerGraph {
     tileNodes.add(node);
   }
   
-  public void addTileNodeToMap(TileNode node, List<TileNode> neighbours) {
-	  explorerMap.put(node, neighbours);
-  }
+ public void addTileNodetoMap(TileNode node, List<TileNode> neighbours) {
+	 explorerMap.put(node, neighbours);
+ }
   
   /**
    * 
@@ -51,12 +51,12 @@ public class ExplorerGraph {
    *  @return ArrayList of unvisited neighbours
    */
  
-  public List<TileNode> getUnvisitedNeighbours(final TileNode node) {
-    final List<TileNode> neighbours = explorerMap.get(node);
-    final List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
+  public List<TileNode> getUnvisitedNeighbours(TileNode node) {
+    List<TileNode> neighbours = explorerMap.get(node);
+    List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
     if (neighbours != null) {
       for (int i = 0; i < neighbours.size(); i++) {
-        final TileNode temp = neighbours.get(i);
+        TileNode temp = neighbours.get(i);
         if (!temp.getVisited()) {
           unvisitedNeighbours.add(temp);
         }
@@ -64,6 +64,7 @@ public class ExplorerGraph {
     }
     return unvisitedNeighbours;
   }
+  
   /**
    *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
    *  @param neighbours - the list of unvisited neighbours to the current node
