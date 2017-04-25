@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import game.NodeStatus;
+
 public class ExplorerGraph {
   private final List<TileNode> tileNodes = new ArrayList<TileNode>();
-  private final Map<TileNode, List<TileNode>> map = new ConcurrentHashMap<>();
+  private final Map<TileNode, List<TileNode>> explorerMap = new ConcurrentHashMap<>();
   private TileNode rootNode;
   
   
@@ -19,16 +21,16 @@ public class ExplorerGraph {
     this.rootNode = root;
   }
   
-  public void addTileNode(TileNode node) {
+  public void addTileNodeToGraph(TileNode node) {
     tileNodes.add(node);
   }
   
   public void connectNode(final TileNode start, final TileNode end) {
-    List<TileNode> nodeList = map.get(start);
+    List<TileNode> nodeList = explorerMap.get(start);
       if (nodeList == null) {
         nodeList = new ArrayList<>();
       }
-    map.put(start, nodeList);
+    explorerMap.put(start, nodeList);
     nodeList.add(end);
   }
   
@@ -36,12 +38,12 @@ public class ExplorerGraph {
    * returns an arraylist of neighbours that have not been visited
    */
   public List<TileNode> getUnvisitedNeighbours(final TileNode node) {
-    final List<TileNode> neighbours = map.get(node);
+    final List<TileNode> neighbours = explorerMap.get(node);
     final List<TileNode> unvisitedNeighbours = new ArrayList<TileNode>();
     if (neighbours != null) {
       for (int i = 0; i < neighbours.size(); i++) {
         final TileNode temp = neighbours.get(i);
-        if (!temp.getVisited()) {
+        if (tileNodes.contains(node)) {
           unvisitedNeighbours.add(temp);
         }
       }
