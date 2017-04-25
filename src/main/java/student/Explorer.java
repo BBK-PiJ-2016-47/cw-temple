@@ -22,6 +22,7 @@ public class Explorer {
   private Stack<Long> visitedTiles = new Stack<Long>(); //stack of IDs that have been visited
   private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours who've not been visited
   private List<Long> usedNodeStatuses = new ArrayList<Long>(); //list of nodestatuses whose neighbours have no unvisited nodes left
+  //private List<TileNode> examinedTiles = new ArrayList<TileNode>();
   
   //variables for escape method
   private List<Node> visitedEscapeNodes = new ArrayList<Node>();
@@ -61,12 +62,17 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-	
-	while (state.getDistanceToTarget() != 0) {
-	  unvisitedNodeStatuses = new ArrayList<>();
+	  //moved outside while loop so it doesn't get mixed up
 	  currentLocation = state.getCurrentLocation();
+	while (state.getDistanceToTarget() != 0) {
+	  
 	  //getting list of current location's neighbours
 	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
+	  
+	  //TileNode tileNode = new TileNode(currentLocation,true,currentDistance,neighbouringNodeStatuses);
+	  //examinedTiles.add(tileNode);
+	  //int currentDistance = state.getDistanceToTarget();
+
 	  //filtering current location's neighbours into those that haven't been visited
 	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
 	  
@@ -85,9 +91,11 @@ public class Explorer {
 	   */
 	  if (usedNodeStatuses.contains(currentLocation)) {
 		  Stack<Long> temp = visitedTiles;
-		  state.moveTo(previousLocation);
 		  temp.pop();
+		  
+		  currentLocation = previousLocation;
 		  previousLocation = temp.peek();
+		  state.moveTo(currentLocation);
 	  } else {
 		  /*
 		   * if the location is not used up, then find the unvisited neighbour with the shortest
@@ -96,6 +104,7 @@ public class Explorer {
 		  visitedTiles.push(currentLocation);
 	      NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
 		  previousLocation = currentLocation;
+		  currentLocation = next.getId();
 		  state.moveTo(next.getId());
 	  }
 	  /*
@@ -131,8 +140,14 @@ public class Explorer {
         shortestDistance = distanceComparison;
       }
     }
+    
     return shortestNeighbour;
   }
+  
+ // private NodeStatus checkingNodes(List<NodeStatus> neighbours) {
+	//  NodeStatus shortestNeighbour = neighbours.get(0);
+	  
+//  }
   
   /**
    *  Returns the list of NodeStatuses of the neighbours to the current location
@@ -140,6 +155,7 @@ public class Explorer {
    *  @param neighbours - the list of neighbours to the current node
    */
   public List<NodeStatus> getUnvisitedNeighbours(List<NodeStatus> neighbours) {
+	unvisitedNodeStatuses = new ArrayList<>();
     for (int i = 0; i < neighbours.size(); i++) {
       NodeStatus temp = neighbours.get(i);
       if (!visitedTiles.contains(temp.getId())) {
