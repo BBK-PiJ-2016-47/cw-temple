@@ -24,9 +24,9 @@ public class Explorer {
   private long previousLocation;
   private int currentDistance;
   private Stack<Long> visitedTiles = new Stack<Long>(); //stack of IDs that have been visited
-  private final Map<TileNode, Set<TileNode>> map = new ConcurrentHashMap<>(); //map of Tiles
+  //private final Map<TileNode, Set<TileNode>> map = new ConcurrentHashMap<>(); //map of Tiles
   
-  private Set<TileNode> neighbouringTileNodes = new HashSet<TileNode>(); //list of currentNode's neighbours
+
   private List<TileNode> unvisitedTileNodes; //list of NodeStatus neighbours who've not been visited
  
   
@@ -70,22 +70,27 @@ public class Explorer {
    */
   @SuppressWarnings("unchecked")
 public void explore(ExplorationState state) {
+	  
+	  ExplorerGraph graph = new ExplorerGraph();
+	  
 	  //moved outside while loop so it doesn't get mixed up
 	  currentLocation = state.getCurrentLocation();
 	  currentDistance = state.getDistanceToTarget();
 	  TileNode currentNode = new TileNode(currentLocation, currentDistance, true);
+	  graph.setRootNode(currentNode);
 	  
 	while (state.getDistanceToTarget() != 0) {
-	  
+      Set<TileNode> neighbouringTileNodes = new HashSet<TileNode>(); //list of currentNode's neighbours
 	  //getting list of current location's neighbours and turn into bespoke Tile Nodes
 	  neighbouringTileNodes = turnIntoTileNode(state.getNeighbours());
 	  
 	  //adding current tile node and its neighbours to map
-	  map.put(currentNode, neighbouringTileNodes);
-
-	  //filtering current location's neighbours into those that haven't been visited
 	  List<TileNode> arrayConversion = new ArrayList<TileNode>(neighbouringTileNodes);
-	  unvisitedTileNodes = getUnvisitedNeighbours(arrayConversion);
+	  graph.addTileNodeToMap(currentNode, arrayConversion);
+      currentNode.setVisited(true);
+      graph.addTileNodeToGraph(currentNode);
+	  //filtering current location's neighbours into those that haven't been visited
+	  unvisitedTileNodes = graph.getUnvisitedNeighbours(currentNode);
 	  
 	  
 	  /*
@@ -103,7 +108,8 @@ public void explore(ExplorationState state) {
 		   * difference to orb and move to it, and update previous location
 		   */
 		  visitedTiles.push(currentLocation);
-	      TileNode next = returnShortestNeighbour(unvisitedTileNodes);
+	      TileNode next = graph.returnShortestNeighbour(unvisitedTileNodes);
+
 		  previousLocation = currentLocation;
 		  currentLocation = next.getId();
 		  state.moveTo(next.getId());
@@ -127,24 +133,6 @@ public void explore(ExplorationState state) {
     return;
   }
   
-  /**
-   *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
-   *  @param neighbours - the list of unvisited neighbours to the current node
-   */
-  private TileNode returnShortestNeighbour(List<TileNode> neighbours) {
-    TileNode shortestNeighbour = neighbours.get(0);
-    int shortestDistance = shortestNeighbour.getDistance();
-    for(TileNode n : neighbours) {
-      int distanceComparison = n.getDistance();
-      if (shortestDistance > distanceComparison) {
-        shortestNeighbour = n;
-        shortestDistance = distanceComparison;
-      }
-    }
-    
-    return shortestNeighbour;
-  }
-  
   private Set<TileNode> turnIntoTileNode(Collection<NodeStatus> neighbours) {
 	Set <TileNode> neighbourinos = new HashSet<TileNode>();
 	for (NodeStatus n : neighbours) {
@@ -157,21 +145,6 @@ public void explore(ExplorationState state) {
 	  
   }
   
-  /**
-   *  Returns the list of NodeStatuses of the neighbours to the current location
-   *  that have not yet been visited
-   *  @param neighbours - the list of neighbours to the current node
-   */
-  public List<TileNode> getUnvisitedNeighbours(List<TileNode> neighbours) {
-	  unvisitedTileNodes = new ArrayList<>();
-    for (int i = 0; i < neighbours.size(); i++) {
-      TileNode temp = neighbours.get(i);
-      if (!map.containsKey(temp.getId())) {
-    	  unvisitedTileNodes.add(temp);
-      }
-    }
-    return unvisitedTileNodes;
-  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
