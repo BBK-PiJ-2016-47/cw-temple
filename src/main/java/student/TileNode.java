@@ -1,19 +1,26 @@
 package student;
 
-
 public class TileNode {
     /*
-    Creating a node for each tile to keep track of visiting based on searchexample
+    Creating a node for each id/nodestatus to keep track of visiting based on searchexample
      */
 
-    private boolean visited;
     private long id;
     private int distance;
+    private boolean visited;
 
-    public TileNode(long id, boolean visited, int distance) {
+    public TileNode(long id, int distance, boolean visited) {
     	this.id = id;
-    	this.visited = visited;
     	this.distance = distance;
+    	this.visited = visited;
+    }
+    
+    public long getId() {
+    	return id;
+    }
+    
+    public int getDistance() {
+    	return distance;
     }
     
     public boolean getVisited() {
@@ -24,12 +31,4 @@ public class TileNode {
         this.visited = visited;
     }
     
-    public long getId() {
-    	return id;
-    }
-    
-    public int getDistance() {
-    	return distance;
-    }
-
 }
