@@ -19,13 +19,7 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-  //variables for explore method
-  private long currentLocation; 
-  private long previousLocation;
-  private int currentDistance;
-  private Stack<Long> visitedTiles = new Stack<Long>(); //stack of IDs that have been visited
-  //private final Map<TileNode, Set<TileNode>> map = new ConcurrentHashMap<>(); //map of Tiles
-  
+
 
   private List<TileNode> unvisitedTileNodes; //list of NodeStatus neighbours who've not been visited
  
@@ -70,14 +64,13 @@ public class Explorer {
    */
   @SuppressWarnings("unchecked")
 public void explore(ExplorationState state) {
-	  
+	  Stack<TileNode> visitedTiles = new Stack<TileNode>(); //stack of Tile Nodes that have been visited
 	  ExplorerGraph graph = new ExplorerGraph();
-	  
-	  //moved outside while loop so it doesn't get mixed up
-	  currentLocation = state.getCurrentLocation();
-	  currentDistance = state.getDistanceToTarget();
-	  TileNode currentNode = new TileNode(currentLocation, currentDistance, true);
+	  TileNode previousNode = null;
+
+	  TileNode currentNode = new TileNode(state.getCurrentLocation(), state.getDistanceToTarget(), true);
 	  graph.setRootNode(currentNode);
+	  visitedTiles.push(currentNode);
 	  
 	while (state.getDistanceToTarget() != 0) {
       Set<TileNode> neighbouringTileNodes = new HashSet<TileNode>(); //list of currentNode's neighbours
@@ -86,9 +79,8 @@ public void explore(ExplorationState state) {
 	  
 	  //adding current tile node and its neighbours to map
 	  List<TileNode> arrayConversion = new ArrayList<TileNode>(neighbouringTileNodes);
-	  graph.addTileNodeToMap(currentNode, arrayConversion);
-      currentNode.setVisited(true);
-      graph.addTileNodeToGraph(currentNode);
+	  graph.addTileNodeToGraph(currentNode);
+	  graph.addTileNodetoMap(currentNode, arrayConversion);
 	  //filtering current location's neighbours into those that haven't been visited
 	  unvisitedTileNodes = graph.getUnvisitedNeighbours(currentNode);
 	  
@@ -99,20 +91,21 @@ public void explore(ExplorationState state) {
 	   */
 	  if (unvisitedTileNodes.isEmpty()) {
 		  visitedTiles.pop();
-		  currentLocation = previousLocation;
-		  previousLocation = visitedTiles.peek();
-		  state.moveTo(currentLocation);
+		  currentNode = visitedTiles.pop();
+		  previousNode = visitedTiles.peek();
+		  state.moveTo(currentNode.getId());
+		  
 	  } else {
 		  /*
 		   * if the location is not used up, then find the unvisited neighbour with the shortest
 		   * difference to orb and move to it, and update previous location
 		   */
-		  visitedTiles.push(currentLocation);
-	      TileNode next = graph.returnShortestNeighbour(unvisitedTileNodes);
-
-		  previousLocation = currentLocation;
-		  currentLocation = next.getId();
-		  state.moveTo(next.getId());
+		  visitedTiles.push(currentNode);
+		  previousNode = currentNode;
+		  currentNode = graph.returnShortestNeighbour(unvisitedTileNodes);
+		  
+		  currentNode.setVisited(true);
+		  state.moveTo(currentNode.getId());
 	  }
 	  /*
 	  if (unvisitedNodeStatuses.isEmpty()){
