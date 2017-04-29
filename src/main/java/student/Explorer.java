@@ -19,7 +19,6 @@ import game.NodeStatus;
 public class Explorer {
   //variables for explore method
   private long currentLocation; 
-  private long previousLocation;
   private Collection<NodeStatus> neighbouringNodeStatuses; //collection of NodeStatus' neighbours
   private Stack<Long> visitedTilesOrder = new Stack<Long>(); //stack of IDs that have been visited
   private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours who've not been visited
@@ -71,43 +70,27 @@ public class Explorer {
 	  neighbouringNodeStatuses = state.getNeighbours();
 	  //filtering current location's neighbours into those that haven't been visited
 	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
-
+	  visitedTiles.add(currentLocation);
 	  
 	  /*
 	   * if the location moved to becomes used, move to previous location, then move the current and previous location 
 	   * off the stack and put the top of the stack as the previous
 	   */
-	  if (visitedTiles.contains(currentLocation)) {
-		  visitedTilesOrder.pop();
-		  state.moveTo(visitedTilesOrder.peek());
+	  if (unvisitedNodeStatuses.isEmpty()) {
+		  visitedTilesOrder.pop();					
+		  state.moveTo(visitedTilesOrder.peek()); 
 		 
 	  } else {
 		  /*
 		   * if the location is not used up, then find the unvisited neighbour with the shortest
 		   * difference to orb and move to it, and update previous location
 		   */
-		  visitedTiles.add(currentLocation);
-		  visitedTilesOrder.push(currentLocation);
-		  if (unvisitedNodeStatuses != null) {
+		 
 	        NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
-		    state.moveTo(next.getId());
-		  }
+	        visitedTilesOrder.push(next.getId());
+	        state.moveTo(next.getId());
 	  }
-	  /*
-	  if (unvisitedNodeStatuses.isEmpty()){
-		//using this list to filter out nodes to never return to
-		//need to update relevant filter methods still
-        usedNodeStatuses.add(currentLocation);
-	    state.moveTo(previousLocation);
-	    Stack<Long> temp = visitedTiles;
-		temp.pop();
-		temp.pop();
-		previousLocation = temp.peek();
-	  } else {
-		NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
-	    previousLocation = currentLocation;
-	    state.moveTo(next.getId());
-	  }*/
+	 
 	}
     return;
   }
