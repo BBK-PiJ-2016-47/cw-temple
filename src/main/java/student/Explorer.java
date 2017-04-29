@@ -73,18 +73,18 @@ public class Explorer {
 	  visitedTiles.add(currentLocation);
 	  
 	  /*
-	   * if the location moved to becomes used, move to previous location, then move the current and previous location 
-	   * off the stack and put the top of the stack as the previous
+	   * if there are no unvisited neighbours, pop the current location off the stack and peek to move to
+	   * the node before
 	   */
 	  if (unvisitedNodeStatuses.isEmpty()) {
 		  visitedTilesOrder.pop();					
 		  state.moveTo(visitedTilesOrder.peek()); 
 		 
 	  } else {
-		  /*
-		   * if the location is not used up, then find the unvisited neighbour with the shortest
-		   * difference to orb and move to it, and update previous location
-		   */
+      /*
+	   * if the location has neighbours, then find the unvisited neighbour with the shortest
+	   * difference to orb and move to it, and update the stack
+	   */
 		 
 	        NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
 	        visitedTilesOrder.push(next.getId());
@@ -97,7 +97,8 @@ public class Explorer {
   
   /**
    *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
-   *  @param neighbours - the list of unvisited neighbours to the current node
+   *  @param List<NodeStatus> neighbours - the list of unvisited neighbours to the current node
+   *  @return NodeStatus shortestNeighbour 
    */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
     NodeStatus shortestNeighbour = neighbours.get(0);
@@ -115,7 +116,8 @@ public class Explorer {
   /**
    *  Returns the list of NodeStatuses of the neighbours to the current location
    *  that have not yet been visited
-   *  @param neighbours - the list of neighbours to the current node
+   *  @param List<NodeStatus> neighbours - the list of neighbours to the current node
+   *  @return List<NodeStatus> unvisitedNodeStatuses - list of filtered neighbours
    */
   public List<NodeStatus> getUnvisitedNeighbours(Collection<NodeStatus> neighbours) {
 	  for (NodeStatus n : neighbours) {
