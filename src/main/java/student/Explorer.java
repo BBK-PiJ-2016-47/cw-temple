@@ -78,10 +78,9 @@ public class Explorer {
 	   * off the stack and put the top of the stack as the previous
 	   */
 	  if (visitedTiles.contains(currentLocation)) {
-		  Stack<Long> temp = visitedTilesOrder;
-		  state.moveTo(previousLocation);
-		  temp.pop();
-		  previousLocation = temp.peek();
+		  visitedTilesOrder.pop();
+		  state.moveTo(visitedTilesOrder.peek());
+		 
 	  } else {
 		  /*
 		   * if the location is not used up, then find the unvisited neighbour with the shortest
@@ -89,9 +88,10 @@ public class Explorer {
 		   */
 		  visitedTiles.add(currentLocation);
 		  visitedTilesOrder.push(currentLocation);
-	      NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
-		  previousLocation = currentLocation;
-		  state.moveTo(next.getId());
+		  if (unvisitedNodeStatuses != null) {
+	        NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
+		    state.moveTo(next.getId());
+		  }
 	  }
 	  /*
 	  if (unvisitedNodeStatuses.isEmpty()){
