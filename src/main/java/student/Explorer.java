@@ -3,13 +3,9 @@ package student;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import game.EscapeState;
@@ -19,11 +15,13 @@ import game.Node;
 import game.NodeStatus;
 
 public class Explorer {
-
-
-  private List<TileNode> unvisitedTileNodes; //list of NodeStatus neighbours who've not been visited
- 
-  
+  //variables for explore method
+  private long currentLocation; 
+  private long previousLocation;
+  private List<NodeStatus> neighbouringNodeStatuses = new ArrayList<NodeStatus>(); //list of NodeStatus' neighbours
+  private Stack<Long> visitedTiles = new Stack<Long>(); //stack of IDs that have been visited
+  private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours who've not been visited
+  private List<Long> usedNodeStatuses = new ArrayList<Long>(); //list of nodestatuses whose neighbours have no unvisited nodes left
   
   //variables for escape method
   private List<Node> visitedEscapeNodes = new ArrayList<Node>();
@@ -62,50 +60,43 @@ public class Explorer {
    *
    * @param state the information available at the current state
    */
-  @SuppressWarnings("unchecked")
-public void explore(ExplorationState state) {
-	  Stack<TileNode> visitedTiles = new Stack<TileNode>(); //stack of Tile Nodes that have been visited
-	  ExplorerGraph graph = new ExplorerGraph();
-	  TileNode previousNode = null;
-
-	  TileNode currentNode = new TileNode(state.getCurrentLocation(), state.getDistanceToTarget(), true);
-	  graph.setRootNode(currentNode);
-	  visitedTiles.push(currentNode);
-	  
+  public void explore(ExplorationState state) {
+	
 	while (state.getDistanceToTarget() != 0) {
-      Set<TileNode> neighbouringTileNodes = new HashSet<TileNode>(); //list of currentNode's neighbours
-	  //getting list of current location's neighbours and turn into bespoke Tile Nodes
-	  neighbouringTileNodes = turnIntoTileNode(state.getNeighbours());
-	  
-	  //adding current tile node and its neighbours to map
-	  List<TileNode> arrayConversion = new ArrayList<TileNode>(neighbouringTileNodes);
-	  graph.addTileNodeToGraph(currentNode);
-	  graph.addTileNodetoMap(currentNode, arrayConversion);
+	  unvisitedNodeStatuses = new ArrayList<>();
+	  currentLocation = state.getCurrentLocation();
+	  //getting list of current location's neighbours
+	  neighbouringNodeStatuses = (List<NodeStatus>) state.getNeighbours();
 	  //filtering current location's neighbours into those that haven't been visited
-	  unvisitedTileNodes = graph.getUnvisitedNeighbours(currentNode);
+	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
 	  
+	  
+	  /*
+	   * if there are no neighbours that have not been visited, put Node in the usedNodeStatuses
+	   * list so that it can never get revisited
+	   */
+	  if (unvisitedNodeStatuses.isEmpty()) {
+		  usedNodeStatuses.add(currentLocation);
+	  }
 	  
 	  /*
 	   * if the location moved to becomes used, move to previous location, then move the current and previous location 
 	   * off the stack and put the top of the stack as the previous
 	   */
-	  if (unvisitedTileNodes.isEmpty()) {
-		  visitedTiles.pop();
-		  currentNode = visitedTiles.pop();
-		  previousNode = visitedTiles.peek();
-		  state.moveTo(currentNode.getId());
-		  
+	  if (usedNodeStatuses.contains(currentLocation)) {
+		  Stack<Long> temp = visitedTiles;
+		  state.moveTo(previousLocation);
+		  temp.pop();
+		  previousLocation = temp.peek();
 	  } else {
 		  /*
 		   * if the location is not used up, then find the unvisited neighbour with the shortest
 		   * difference to orb and move to it, and update previous location
 		   */
-		  visitedTiles.push(currentNode);
-		  previousNode = currentNode;
-		  currentNode = graph.returnShortestNeighbour(unvisitedTileNodes);
-		  
-		  currentNode.setVisited(true);
-		  state.moveTo(currentNode.getId());
+		  visitedTiles.push(currentLocation);
+	      NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
+		  previousLocation = currentLocation;
+		  state.moveTo(next.getId());
 	  }
 	  /*
 	  if (unvisitedNodeStatuses.isEmpty()){
@@ -126,18 +117,37 @@ public void explore(ExplorationState state) {
     return;
   }
   
-  private Set<TileNode> turnIntoTileNode(Collection<NodeStatus> neighbours) {
-	Set <TileNode> neighbourinos = new HashSet<TileNode>();
-	for (NodeStatus n : neighbours) {
-		long id = n.getId();
-		int distance = n.getDistanceToTarget();
-		TileNode tile = new TileNode(id, distance, false);
-		neighbourinos.add(tile);
-	}
-	return neighbourinos;
-	  
+  /**
+   *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
+   *  @param neighbours - the list of unvisited neighbours to the current node
+   */
+  private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
+    NodeStatus shortestNeighbour = neighbours.get(0);
+    int shortestDistance = shortestNeighbour.getDistanceToTarget();
+    for(NodeStatus n : neighbours) {
+      int distanceComparison = n.getDistanceToTarget();
+      if (shortestDistance > distanceComparison) {
+        shortestNeighbour = n;
+        shortestDistance = distanceComparison;
+      }
+    }
+    return shortestNeighbour;
   }
   
+  /**
+   *  Returns the list of NodeStatuses of the neighbours to the current location
+   *  that have not yet been visited
+   *  @param neighbours - the list of neighbours to the current node
+   */
+  public List<NodeStatus> getUnvisitedNeighbours(List<NodeStatus> neighbours) {
+    for (int i = 0; i < neighbours.size(); i++) {
+      NodeStatus temp = neighbours.get(i);
+      if (!visitedTiles.contains(temp.getId())) {
+    	  unvisitedNodeStatuses.add(temp);
+      }
+    }
+    return unvisitedNodeStatuses;
+  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
