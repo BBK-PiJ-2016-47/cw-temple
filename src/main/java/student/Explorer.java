@@ -2,26 +2,24 @@ package student;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.ThreadLocalRandom;
 
 import game.EscapeState;
 import game.ExplorationState;
-import game.GameState;
 import game.Node;
 import game.NodeStatus;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Explorer {
   //variables for explore method
   private long currentLocation; 
   private Collection<NodeStatus> neighbouringNodeStatuses; //collection of NodeStatus' neighbours
   private Stack<Long> visitedTilesOrder = new Stack<Long>(); //stack of IDs that have been visited
-  private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours who've not been visited
+  private List<NodeStatus> unvisitedNodeStatuses; //list of NodeStatus neighbours not been visited
   private Set<Long> visitedTiles = new HashSet<Long>();
   
   //variables for escape method
@@ -62,36 +60,33 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-	
-	while (state.getDistanceToTarget() != 0) {
-	  unvisitedNodeStatuses = new ArrayList<>();
-	  currentLocation = state.getCurrentLocation();
-	  //getting list of current location's neighbours
-	  neighbouringNodeStatuses = state.getNeighbours();
-	  //filtering current location's neighbours into those that haven't been visited
-	  unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
-	  visitedTiles.add(currentLocation);
-	  
-	  /*
-	   * if there are no unvisited neighbours, pop the current location off the stack and peek to move to
-	   * the node before
-	   */
-	  if (unvisitedNodeStatuses.isEmpty()) {
-		  visitedTilesOrder.pop();					
-		  state.moveTo(visitedTilesOrder.peek()); 
-		 
-	  } else {
+
+    while (state.getDistanceToTarget() != 0) {
+      unvisitedNodeStatuses = new ArrayList<>();
+      currentLocation = state.getCurrentLocation();
+      //getting list of current location's neighbours
+      neighbouringNodeStatuses = state.getNeighbours();
+      //filtering current location's neighbours into those that haven't been visited
+      unvisitedNodeStatuses = getUnvisitedNeighbours(neighbouringNodeStatuses);
+      visitedTiles.add(currentLocation);
+
       /*
-	   * if the location has neighbours, then find the unvisited neighbour with the shortest
-	   * difference to orb and move to it, and update the stack
-	   */
-		 
-	        NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
-	        visitedTilesOrder.push(next.getId());
-	        state.moveTo(next.getId());
-	  }
-	 
-	}
+       * if there are no unvisited neighbours, pop the current location off the stack and 
+       * peek to move to the node before
+       */
+      if (unvisitedNodeStatuses.isEmpty()) {
+        visitedTilesOrder.pop();
+        state.moveTo(visitedTilesOrder.peek()); 
+      } else {
+        /*
+         * if the location has neighbours, then find the unvisited neighbour with the shortest
+         * difference to orb and move to it, and update the stack
+         */
+        NodeStatus next = returnShortestNeighbour(unvisitedNodeStatuses);
+        visitedTilesOrder.push(next.getId());
+        state.moveTo(next.getId());
+      }
+    }
     return;
   }
   
