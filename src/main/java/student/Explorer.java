@@ -2,8 +2,10 @@ package student;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -152,12 +154,18 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     nodesToVisit = new HashSet<Node>(state.getVertices());
-    
+    Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
     //TODO: Escape from the cavern before time runs out
     while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
+      //need to figure out how to make a path to exitNode
+      Node exitNode = state.getExit();
+      Set<Node> exitNeighbours = exitNode.getNeighbours();
       unvisitedEscapeNodes = new ArrayList<Node>();
       currentNode = state.getCurrentNode();
       Tile currentTile = currentNode.getTile();
+      Tile exitTile = exitNode.getTile();
+      int exitRow = exitTile.getRow();
+      int exitColumn = exitTile.getColumn();
       //pick up gold without throwing an exception
       if(currentTile.getGold() > 0){
         state.pickUpGold(); 
@@ -166,8 +174,15 @@ public class Explorer {
       neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
       unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
       visitedEscapeTiles.add(currentNode.getId());
+      nodesAndNeighbours.put(currentNode, neighbouringEscapeNodes);
 
       if(!unvisitedEscapeNodes.isEmpty()) {
+    	for (Node n : unvisitedEscapeNodes) {
+    		if (exitNeighbours.contains(n) && (currentTile.getRow() == exitTile.getRow() || currentTile.getColumn() == exitTile.getColumn())) {
+    			//issue when on a neighbour node that is diagonally a neighbour
+    			state.moveTo(exitNode);
+    		}
+    	}
         visitedEscapeOrder.push(unvisitedEscapeNodes.get(0));
         state.moveTo(unvisitedEscapeNodes.get(0));
       } else {
