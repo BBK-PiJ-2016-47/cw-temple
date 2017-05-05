@@ -180,7 +180,7 @@ public class Explorer {
 
       if(!unvisitedEscapeNodes.isEmpty()) {
     	for (Node n : unvisitedEscapeNodes) {
-    		if (exitNeighbours.contains(n) && (currentTile.getRow() == exitTile.getRow() || currentTile.getColumn() == exitTile.getColumn())) {
+    		if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
     			//issue when on a neighbour node that is diagonally a neighbour
     			state.moveTo(n);
     		}
@@ -209,11 +209,8 @@ public class Explorer {
    */
   
   private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
-      for (Node n: neighbours) {
-          if (!visitedEscapeTiles.contains(n.getId())) {
-              unvisitedEscapeNodes.add(n);
-          }
-      }
+    neighbours.forEach(n -> {
+      if (!visitedEscapeTiles.contains(n.getId())) { unvisitedEscapeNodes.add(n); } } );
       return unvisitedEscapeNodes;
   }
 
