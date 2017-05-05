@@ -120,12 +120,9 @@ public class Explorer {
    *  @return unvisitedNodeStatuses - list of filtered neighbours
    */
   public List<NodeStatus> getUnvisitedNeighbours(Collection<NodeStatus> neighbours) {
-    for (NodeStatus n : neighbours) {
-      if (!visitedTiles.contains(n.getId())) {
-        unvisitedNodeStatuses.add(n);
-      }
-    }
-    return unvisitedNodeStatuses;
+	  neighbours.forEach(n -> {
+	      if (!visitedTiles.contains(n.getId())) { unvisitedNodeStatuses.add(n); } } );
+	      return unvisitedNodeStatuses;
   }
 
   /**
