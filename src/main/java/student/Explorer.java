@@ -11,6 +11,7 @@ import game.EscapeState;
 import game.ExplorationState;
 import game.Node;
 import game.NodeStatus;
+import game.Tile;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -23,9 +24,11 @@ public class Explorer {
   private Set<Long> visitedTiles = new HashSet<Long>();
   
   //variables for escape method
-  private List<Node> visitedEscapeNodes = new ArrayList<Node>();
-  private List<Node> unvisitedEscapeNodes;
+  private Stack<Node> visitedEscapeOrder = new Stack<Node>();
+  private List<Node> unvisitedEscapeNodes = new ArrayList<Node>();
   private List<Node> neighbouringEscapeNodes;
+  List<Long>visitedEscapeTiles = new ArrayList<Long>();
+  Set<Node> nodesToVisit;
   private Node currentNode;
   private Node previousNode;
 
@@ -98,7 +101,7 @@ public class Explorer {
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
     NodeStatus shortestNeighbour = neighbours.get(0);
     int shortestDistance = shortestNeighbour.getDistanceToTarget();
-    for(NodeStatus n : neighbours) {
+    for (NodeStatus n : neighbours) {
       int distanceComparison = n.getDistanceToTarget();
       if (shortestDistance > distanceComparison) {
         shortestNeighbour = n;
@@ -111,16 +114,16 @@ public class Explorer {
   /**
    *  Returns the list of NodeStatuses of the neighbours to the current location
    *  that have not yet been visited
-   *  @param List<NodeStatus> neighbours - the list of neighbours to the current node
-   *  @return List<NodeStatus> unvisitedNodeStatuses - list of filtered neighbours
+   *  @param neighbours - the collection of neighbours to the current node
+   *  @return unvisitedNodeStatuses - list of filtered neighbours
    */
   public List<NodeStatus> getUnvisitedNeighbours(Collection<NodeStatus> neighbours) {
-	  for (NodeStatus n : neighbours) {
-          if (!visitedTiles.contains(n.getId())) {
-              unvisitedNodeStatuses.add(n);
-          }
+    for (NodeStatus n : neighbours) {
+      if (!visitedTiles.contains(n.getId())) {
+        unvisitedNodeStatuses.add(n);
       }
-      return unvisitedNodeStatuses;
+    }
+    return unvisitedNodeStatuses;
   }
 
   /**
@@ -148,32 +151,32 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
+    nodesToVisit = new HashSet<Node>(state.getVertices());
+    
     //TODO: Escape from the cavern before time runs out
-	  visitedEscapeNodes = new ArrayList<Node>();
-	  while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-		  unvisitedEscapeNodes = new ArrayList<Node>();
-		  currentNode = state.getCurrentNode();
-		  //pick up gold without throwing an exception
-		  if(state.getCurrentNode().getTile().getGold() > 0){
-			  state.pickUpGold(); 
-		  }
-		  neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
-		  unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
-		  visitedEscapeNodes.add(currentNode);
-		  
-		  if(!unvisitedEscapeNodes.isEmpty()) {
-			  int size = unvisitedEscapeNodes.size();
-			  //generating a random number for the next tile
-			  int randomNum = ThreadLocalRandom.current().nextInt(0, size);
-			  state.moveTo(unvisitedEscapeNodes.get(randomNum));
-		  } else {
-			  Node previousTile = visitedEscapeNodes.get(visitedEscapeNodes.size()-1);
-              state.moveTo(previousTile);
-              visitedEscapeNodes = new ArrayList<Node>();
-		  }
-		  
-	  }
-	  return;
+    while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
+      unvisitedEscapeNodes = new ArrayList<Node>();
+      currentNode = state.getCurrentNode();
+      Tile currentTile = currentNode.getTile();
+      //pick up gold without throwing an exception
+      if(currentTile.getGold() > 0){
+        state.pickUpGold(); 
+      }
+      nodesToVisit.remove(currentNode);
+      neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
+      unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
+      visitedEscapeTiles.add(currentNode.getId());
+
+      if(!unvisitedEscapeNodes.isEmpty()) {
+        visitedEscapeOrder.push(unvisitedEscapeNodes.get(0));
+        state.moveTo(unvisitedEscapeNodes.get(0));
+      } else {
+        visitedEscapeOrder.pop();
+        state.moveTo(visitedEscapeOrder.peek());
+        
+      }
+    }
+    return;
   }
   
   /**
@@ -184,13 +187,12 @@ public class Explorer {
    */
   
   private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
-    for (int i = 0; i < neighbours.size(); i++) {
-      Node temp = neighbours.get(i);
-      if (!visitedEscapeNodes.contains(temp)) {
-    	  unvisitedEscapeNodes.add(temp);
+      for (Node n: neighbours) {
+          if (!visitedEscapeTiles.contains(n.getId())) {
+              unvisitedEscapeNodes.add(n);
+          }
       }
-    }
-    return unvisitedEscapeNodes;
+      return unvisitedEscapeNodes;
   }
 
   private Node returnOptimumTile(List<Node> neighbours) {
