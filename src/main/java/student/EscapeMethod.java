@@ -35,20 +35,24 @@ public class EscapeMethod {
 		exitEdges = exit.getExits();
 	}
 	
-	public void scanforRoute(Node current) {
-		route.add(exit);
-		Set<Node> neighbours = nodesAndFriends.get(current);
-		for (Node n : neighbours) {
-			for (Edge e : exitEdges) {
-				if (n.getExits().contains(e)) {
-					route.add(current);
-				} else {
-					route.add(n);
-					scanforRoute(n);
-				}
-		}
-	  }
-	}
+  public List<Node> scanforRoute(Node current) {
+    List<Node> tempRoute = new ArrayList<>();
+    tempRoute.add(exit);
+    Set<Node> neighbours = nodesAndFriends.get(current);
+    for (Node n : neighbours) {
+      for (Edge e : exitEdges) {
+        if (n.getExits().contains(e)) {
+          route.add(current);
+          break;
+        } else {
+          //threads might be a good idea here?
+          route.add(n);
+          scanforRoute(n);
+        }
+      }
+    }
+    return tempRoute;
+  }
 	
 	public void updateMaps(Node current, Set<Node> neighbours) {
 	  nodesAndFriends.put(current, neighbours);
