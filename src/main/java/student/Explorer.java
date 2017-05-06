@@ -32,7 +32,6 @@ public class Explorer {
   List<Long>visitedEscapeTiles = new ArrayList<Long>();
   Set<Node> nodesToVisit;
   private Node currentNode;
-  private Node previousNode;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -101,8 +100,8 @@ public class Explorer {
    *  @return shortestNeighbour 
    */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
-	  neighbours.sort((s1, s2) -> s1.getDistanceToTarget() - s2.getDistanceToTarget());
-      return neighbours.get(0);
+    neighbours.sort((s1, s2) -> s1.getDistanceToTarget() - s2.getDistanceToTarget());
+    return neighbours.get(0);
   }
   
   /**
@@ -112,9 +111,9 @@ public class Explorer {
    *  @return unvisitedNodeStatuses - list of filtered neighbours
    */
   public List<NodeStatus> getUnvisitedNeighbours(Collection<NodeStatus> neighbours) {
-	  neighbours.forEach(n -> {
-	      if (!visitedTiles.contains(n.getId())) { unvisitedNodeStatuses.add(n); } } );
-	      return unvisitedNodeStatuses;
+    neighbours.forEach(n -> {
+	if (!visitedTiles.contains(n.getId())) { unvisitedNodeStatuses.add(n); } } );
+	return unvisitedNodeStatuses;
   }
 
   /**
@@ -141,85 +140,64 @@ public class Explorer {
    *
    * @param state the information available at the current state
    */
-  List<Node> route = new ArrayList<Node>();
   
   public void escape(EscapeState state) {
-	  nodesToVisit = new HashSet<Node>(state.getVertices());
-	    Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
-	    //pushing root node on stack
-	    visitedEscapeOrder.push(state.getCurrentNode());
-	    
-	    while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-	      //resets list of neighbours for each node visited
-	      unvisitedEscapeNodes = new ArrayList<Node>();
-	      //exitNode info
-	      Node exitNode = state.getExit();
-	      Set<Node> exitNeighbours = exitNode.getNeighbours();
-	      Tile exitTile = exitNode.getTile();
-	      int exitRow = exitTile.getRow();
-	      int exitColumn = exitTile.getColumn();
-	      //currentNode info
-	      currentNode = state.getCurrentNode();
-	      Tile currentTile = currentNode.getTile();
-	      
-	      //pick up gold without throwing an exception
-	      if(currentTile.getGold() > 0){
-	        state.pickUpGold(); 
-	      }
-	      
-	      nodesToVisit.remove(currentNode);
-	      neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
-	      unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
-	      visitedEscapeTiles.add(currentNode.getId());
-	      nodesAndNeighbours.put(currentNode, neighbouringEscapeNodes);
+    nodesToVisit = new HashSet<Node>(state.getVertices());
+    Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
+    //pushing root node on stack
+    visitedEscapeOrder.push(state.getCurrentNode());
 
-	      if(!unvisitedEscapeNodes.isEmpty()) {
-	    	for (Node n : unvisitedEscapeNodes) {
-	    		if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
-	    			//issue when on a neighbour node that is diagonally a neighbour
-	    			state.moveTo(n);
-	    		}
-	    		
-	    		if (n.equals(exitNode) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
-	    			state.moveTo(exitNode);
-	    			return;
-	    		}
-	    	}
-	        visitedEscapeOrder.push(unvisitedEscapeNodes.get(0));
-	        state.moveTo(unvisitedEscapeNodes.get(0));
-	      } else {
-	        visitedEscapeOrder.pop();
-	        state.moveTo(visitedEscapeOrder.peek());
-	        
-	      }
-	    }
-	    return;
-	  }
-	  
-	  /**
-	   * Finds a list of unvisited nodes to collect gold from
-	   * 
-	   * @param neighbours list of neighbour nodes
-	   * @return list of unvisited neighbour nodes
-	   */
-	  
-	  private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
-	    neighbours.forEach(n -> {
-	      if (!visitedEscapeTiles.contains(n.getId())) { unvisitedEscapeNodes.add(n); } } );
-	      return unvisitedEscapeNodes;
-	  }
+    while (!state.getCurrentNode().equals(state.getExit())) {
+      //need to figure out how to make a path to exitNode
+      Node exitNode = state.getExit();
+      Set<Node> exitNeighbours = exitNode.getNeighbours();
+      unvisitedEscapeNodes = new ArrayList<Node>();
+      currentNode = state.getCurrentNode();
+      Tile currentTile = currentNode.getTile();
+      Tile exitTile = exitNode.getTile();
+      int exitRow = exitTile.getRow();
+      int exitColumn = exitTile.getColumn();
+      //pick up gold without throwing an exception
+      if(currentTile.getGold() > 0){
+        state.pickUpGold();
+      }
+      nodesToVisit.remove(currentNode);
+      neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours());
+      unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
+      visitedEscapeTiles.add(currentNode.getId());
+      nodesAndNeighbours.put(currentNode, neighbouringEscapeNodes);
 
-	  private Node returnOptimumTile(List<Node> neighbours) {
-	    //need to graph out the best route by going through them all?
-		//Or leave a buffer of 2 in time to allow for getting lost
-		Node bestNeighbour = neighbours.get(0);
-		List<Node> nodesWithGold = new ArrayList<Node>();
-	    //checking which neighbours have gold but also need to know distance too right?
-	    for(Node n : neighbours) {
-	      if (n.getTile().getGold() > 0) {
-	        nodesWithGold.add(n);
-	      }
-	    }
-		return bestNeighbour;
-	  }
-	}
+      if(!unvisitedEscapeNodes.isEmpty()) {
+        for (Node n : unvisitedEscapeNodes) {
+          if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow|| currentTile.getColumn() == exitColumn)) {
+            state.moveTo(n);
+            return;
+          }
+
+          if (n.equals(exitNode)) {
+            state.moveTo(exitNode);
+            return;
+          }
+        }
+        visitedEscapeOrder.push(unvisitedEscapeNodes.get(0));
+        state.moveTo(unvisitedEscapeNodes.get(0));
+      } else {
+        visitedEscapeOrder.pop();
+        state.moveTo(visitedEscapeOrder.peek());
+      }
+    }
+    return;
+  }
+	  
+/**
+  * Finds a list of unvisited nodes to collect gold from
+  *
+  * @param neighbours list of neighbour nodes
+  * @return list of unvisited neighbour nodes
+  */
+  private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
+    neighbours.forEach(n -> {
+      if (!visitedEscapeTiles.contains(n.getId())) { unvisitedEscapeNodes.add(n); } } );
+      return unvisitedEscapeNodes;
+  }
+}
