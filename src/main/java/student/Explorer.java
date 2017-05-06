@@ -101,16 +101,8 @@ public class Explorer {
    *  @return NodeStatus shortestNeighbour 
    */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
-    NodeStatus shortestNeighbour = neighbours.get(0);
-    int shortestDistance = shortestNeighbour.getDistanceToTarget();
-    for (NodeStatus n : neighbours) {
-      int distanceComparison = n.getDistanceToTarget();
-      if (shortestDistance > distanceComparison) {
-        shortestNeighbour = n;
-        shortestDistance = distanceComparison;
-      }
-    }
-    return shortestNeighbour;
+	  neighbours.sort((s1, s2) -> s1.getDistanceToTarget() - s2.getDistanceToTarget());
+      return neighbours.get(0);
   }
   
   /**
@@ -154,21 +146,25 @@ public class Explorer {
     Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
     //pushing root node on stack
     visitedEscapeOrder.push(state.getCurrentNode());
-    //TODO: Escape from the cavern before time runs out
+    
     while (state.getTimeRemaining() != 0 || !state.getCurrentNode().equals(state.getExit())) {
-      //need to figure out how to make a path to exitNode
+      //resets list of neighbours for each node visited
+      unvisitedEscapeNodes = new ArrayList<Node>();
+      //exitNode info
       Node exitNode = state.getExit();
       Set<Node> exitNeighbours = exitNode.getNeighbours();
-      unvisitedEscapeNodes = new ArrayList<Node>();
-      currentNode = state.getCurrentNode();
-      Tile currentTile = currentNode.getTile();
       Tile exitTile = exitNode.getTile();
       int exitRow = exitTile.getRow();
       int exitColumn = exitTile.getColumn();
+      //currentNode info
+      currentNode = state.getCurrentNode();
+      Tile currentTile = currentNode.getTile();
+      
       //pick up gold without throwing an exception
       if(currentTile.getGold() > 0){
         state.pickUpGold(); 
       }
+      
       nodesToVisit.remove(currentNode);
       neighbouringEscapeNodes = new ArrayList<Node>(currentNode.getNeighbours()); 
       unvisitedEscapeNodes = returnUnvisitedEscapeNeighbours(neighbouringEscapeNodes);
@@ -182,7 +178,7 @@ public class Explorer {
     			state.moveTo(n);
     		}
     		
-    		if (n.equals(exitNode)) {
+    		if (n.equals(exitNode) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
     			state.moveTo(exitNode);
     			return;
     		}
