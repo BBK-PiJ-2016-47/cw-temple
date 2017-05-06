@@ -2,8 +2,10 @@ package student;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import game.Edge;
@@ -36,13 +38,13 @@ public class EscapeMethod {
 	  System.out.println("starting route scan");
 	nodesAndParents.put(current, null);
 	System.out.println("put nodes in maps");
-    List<Node> routePlan = new ArrayList<>();
+    Queue<Node> routePlan = new LinkedList<>();
     Node tempCurrent = current;
     routePlan.add(tempCurrent);
     while (!routePlan.isEmpty()) {
         System.out.println("starting while routeplan is not empty loop");
         Set<Node> neighbours = tempCurrent.getNeighbours();
-        routePlan.remove(0);
+        routePlan.poll();
       for (Node n : neighbours) {
         if (!nodesAndParents.containsKey(n)){
         	 System.out.println("iterating through neighbours to add to maps");
