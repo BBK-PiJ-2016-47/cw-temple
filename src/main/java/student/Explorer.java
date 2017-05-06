@@ -97,8 +97,8 @@ public class Explorer {
   
   /**
    *  Returns the NodeStatus of the neighbour with the shortest distance to the orb
-   *  @param List<NodeStatus> neighbours - the list of unvisited neighbours to the current node
-   *  @return NodeStatus shortestNeighbour 
+   *  @param neighbours - the list of unvisited neighbours to the current node
+   *  @return shortestNeighbour 
    */
   private NodeStatus returnShortestNeighbour(List<NodeStatus> neighbours) {
 	  neighbours.sort((s1, s2) -> s1.getDistanceToTarget() - s2.getDistanceToTarget());
@@ -141,6 +141,8 @@ public class Explorer {
    *
    * @param state the information available at the current state
    */
+  List<Node> route = new ArrayList<Node>();
+  
   public void escape(EscapeState state) {
     nodesToVisit = new HashSet<Node>(state.getVertices());
     Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
@@ -159,7 +161,7 @@ public class Explorer {
       //currentNode info
       currentNode = state.getCurrentNode();
       Tile currentTile = currentNode.getTile();
-      
+     
       //pick up gold without throwing an exception
       if(currentTile.getGold() > 0){
         state.pickUpGold(); 
@@ -193,7 +195,7 @@ public class Explorer {
     }
     return;
   }
-  
+
   /**
    * Finds a list of unvisited nodes to collect gold from
    * 
@@ -207,17 +209,4 @@ public class Explorer {
       return unvisitedEscapeNodes;
   }
 
-  private Node returnOptimumTile(List<Node> neighbours) {
-    //need to graph out the best route by going through them all?
-	//Or leave a buffer of 2 in time to allow for getting lost
-	Node bestNeighbour = neighbours.get(0);
-	List<Node> nodesWithGold = new ArrayList<Node>();
-    //checking which neighbours have gold but also need to know distance too right?
-    for(Node n : neighbours) {
-      if (n.getTile().getGold() > 0) {
-        nodesWithGold.add(n);
-      }
-    }
-	return bestNeighbour;
-  }
 }
