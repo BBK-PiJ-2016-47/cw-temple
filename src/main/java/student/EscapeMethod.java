@@ -47,18 +47,27 @@ public class EscapeMethod {
         } else {
           //threads might be a good idea here?
           route.add(n);
+          //causing a stack overflow
           scanforRoute(n);
         }
       }
     }
     return tempRoute;
   }
-	
+  
+  public void followRoute(EscapeState state, List<Node> route) {
+    for (Node n : route) {
+      state.moveTo(n);
+    }
+  }
+
 	public void updateMaps(Node current, Set<Node> neighbours) {
 	  nodesAndFriends.put(current, neighbours);
 	  for (Node n : neighbours) {
 		  Set<Node> nodeNeighbours = n.getNeighbours();
-		  updateMaps(n, nodeNeighbours);
+		  if(!nodesAndFriends.keySet().contains(n)) {
+		    updateMaps(n, nodeNeighbours);
+		  }
 	  }
         
 	}
