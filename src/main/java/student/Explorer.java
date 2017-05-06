@@ -144,6 +144,17 @@ public class Explorer {
   List<Node> route = new ArrayList<Node>();
   
   public void escape(EscapeState state) {
+      EscapeMethod escape = new EscapeMethod();
+      nodesToVisit = new HashSet<Node>(state.getVertices());
+      currentNode = state.getCurrentNode();
+      Set<Node> neighbourinos = currentNode.getNeighbours();
+      escape.pinpointExit(state.getExit());
+      escape.updateMaps(currentNode, neighbourinos);
+
+      List<Node> route = escape.scanforRoute(currentNode);
+      escape.followRoute(state, route);
+	  /*
+	EscapeMethod escape = new EscapeMethod();
     nodesToVisit = new HashSet<Node>(state.getVertices());
     Map<Node, List<Node>> nodesAndNeighbours = new HashMap<Node, List<Node>>();
     //pushing root node on stack
@@ -154,6 +165,7 @@ public class Explorer {
       unvisitedEscapeNodes = new ArrayList<Node>();
       //exitNode info
       Node exitNode = state.getExit();
+      escape.pinpointExit(exitNode);
       Set<Node> exitNeighbours = exitNode.getNeighbours();
       Tile exitTile = exitNode.getTile();
       int exitRow = exitTile.getRow();
@@ -176,7 +188,6 @@ public class Explorer {
       if(!unvisitedEscapeNodes.isEmpty()) {
     	for (Node n : unvisitedEscapeNodes) {
     		if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
-    			//issue when on a neighbour node that is diagonally a neighbour
     			state.moveTo(n);
     		}
     		
@@ -192,7 +203,7 @@ public class Explorer {
         state.moveTo(visitedEscapeOrder.peek());
         
       }
-    }
+    }*/
     return;
   }
 
