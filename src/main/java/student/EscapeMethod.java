@@ -1,10 +1,7 @@
 package student;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +21,7 @@ public class EscapeMethod {
 	Node exit;
 	List<Node> route = new ArrayList<>();
 	Map<Node, Set<Node>> nodesAndFriends = new HashMap<>();
-	Map<Node, Integer> nodesAndDistances = new HashMap<>();
+	Map<Node, Node> nodesAndParents = new HashMap<>();
 	
 	public void pinpointExit(Node exit) {
 		this.exit = exit;
@@ -36,30 +33,42 @@ public class EscapeMethod {
 	}
 	
   public List<Node> scanforRoute(Node current) {
-    List<Node> tempRoute = new ArrayList<>();
-    tempRoute.add(exit);
-    Set<Node> neighbours = nodesAndFriends.get(current);
-    for (Node n : neighbours) {
-      for (Edge e : exitEdges) {
-        if (n.getExits().contains(e)) {
-          route.add(current);
-          break;
-        } else {
-          //threads might be a good idea here?
-          route.add(n);
-          //causing a stack overflow
-          scanforRoute(n);
+	  System.out.println("starting route scan");
+	nodesAndParents.put(current, null);
+	System.out.println("put nodes in maps");
+    List<Node> routePlan = new ArrayList<>();
+    Node tempCurrent = current;
+    routePlan.add(tempCurrent);
+    while (!routePlan.isEmpty()) {
+        System.out.println("starting while routeplan is not empty loop");
+        Set<Node> neighbours = tempCurrent.getNeighbours();
+        routePlan.remove(0);
+      for (Node n : neighbours) {
+        if (!nodesAndParents.containsKey(n)){
+        	 System.out.println("iterating through neighbours to add to maps");
+    	  nodesAndParents.put(n, tempCurrent);
+    	  routePlan.add(n);
         }
       }
     }
-    return tempRoute;
+    List<Node> actualRoute = new ArrayList<>();
+    actualRoute.add(exit);
+    while (!exit.equals(current)) {
+    	System.out.println("starting adding nodes to current loop ");
+    	exit = nodesAndParents.get(exit);
+    	actualRoute.add(exit);
+    }
+    return actualRoute;
   }
+
+
   
   public void followRoute(EscapeState state, List<Node> route) {
     for (Node n : route) {
       state.moveTo(n);
     }
   }
+
 
 	public void updateMaps(Node current, Set<Node> neighbours) {
 	  nodesAndFriends.put(current, neighbours);

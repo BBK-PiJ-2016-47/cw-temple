@@ -144,15 +144,28 @@ public class Explorer {
   List<Node> route = new ArrayList<Node>();
   
   public void escape(EscapeState state) {
+	  System.out.println("starting escape method");
       EscapeMethod escape = new EscapeMethod();
       nodesToVisit = new HashSet<Node>(state.getVertices());
       currentNode = state.getCurrentNode();
       Set<Node> neighbourinos = currentNode.getNeighbours();
       escape.pinpointExit(state.getExit());
-      escape.updateMaps(currentNode, neighbourinos);
-
+      System.out.println("pinpointing exits");
+      //escape.updateMaps(currentNode, neighbourinos);
+      Tile currentTile = currentNode.getTile();
       List<Node> route = escape.scanforRoute(currentNode);
-      escape.followRoute(state, route);
+      System.out.println("got the route!");
+      if (route.isEmpty()) {
+          System.out.println("This is empty!!");
+      }
+      while(!state.getCurrentNode().equals(state.getExit())){
+          if(currentTile.getGold() > 0){
+              state.pickUpGold();
+          }
+          for (Node n : route) {
+              state.moveTo(n);
+          }
+      }
 	  /*
 	EscapeMethod escape = new EscapeMethod();
     nodesToVisit = new HashSet<Node>(state.getVertices());
