@@ -1,5 +1,11 @@
 package student;
 
+import game.EscapeState;
+import game.ExplorationState;
+import game.Node;
+import game.NodeStatus;
+import game.Tile;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,14 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import game.EscapeState;
-import game.ExplorationState;
-import game.Node;
-import game.NodeStatus;
-import game.Tile;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Explorer {
   //variables for explore method
@@ -29,8 +27,8 @@ public class Explorer {
   private Stack<Node> visitedEscapeOrder = new Stack<Node>();
   private List<Node> unvisitedEscapeNodes = new ArrayList<Node>();
   private List<Node> neighbouringEscapeNodes;
-  List<Long>visitedEscapeTiles = new ArrayList<Long>();
-  Set<Node> nodesToVisit;
+  private List<Long> visitedEscapeTiles = new ArrayList<Long>();
+  private Set<Node> nodesToVisit;
   private Node currentNode;
 
   /**
@@ -112,8 +110,11 @@ public class Explorer {
    */
   public List<NodeStatus> getUnvisitedNeighbours(Collection<NodeStatus> neighbours) {
     neighbours.forEach(n -> {
-	if (!visitedTiles.contains(n.getId())) { unvisitedNodeStatuses.add(n); } } );
-	return unvisitedNodeStatuses;
+      if (!visitedTiles.contains(n.getId())) { 
+        unvisitedNodeStatuses.add(n); 
+      } 
+    } );
+    return unvisitedNodeStatuses;
   }
 
   /**
@@ -158,7 +159,7 @@ public class Explorer {
       int exitRow = exitTile.getRow();
       int exitColumn = exitTile.getColumn();
       //pick up gold without throwing an exception
-      if(currentTile.getGold() > 0){
+      if (currentTile.getGold() > 0) {
         state.pickUpGold();
       }
       nodesToVisit.remove(currentNode);
@@ -167,9 +168,9 @@ public class Explorer {
       visitedEscapeTiles.add(currentNode.getId());
       nodesAndNeighbours.put(currentNode, neighbouringEscapeNodes);
 
-      if(!unvisitedEscapeNodes.isEmpty()) {
+      if (!unvisitedEscapeNodes.isEmpty()) {
         for (Node n : unvisitedEscapeNodes) {
-          if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow|| currentTile.getColumn() == exitColumn)) {
+          if (exitNeighbours.contains(n) && (currentTile.getRow() == exitRow || currentTile.getColumn() == exitColumn)) {
             state.moveTo(n);
             return;
           }
@@ -177,6 +178,10 @@ public class Explorer {
           if (n.equals(exitNode)) {
             state.moveTo(exitNode);
             return;
+          }
+
+          if (n.getTile().getGold() > 0 && (currentTile.getRow() == n.getTile().getRow() || currentTile.getColumn() == n.getTile().getRow())) {
+            state.moveTo(n);
           }
         }
         visitedEscapeOrder.push(unvisitedEscapeNodes.get(0));
@@ -188,7 +193,7 @@ public class Explorer {
     }
     return;
   }
-	  
+
 /**
   * Finds a list of unvisited nodes to collect gold from
   *
@@ -197,7 +202,10 @@ public class Explorer {
   */
   private List<Node> returnUnvisitedEscapeNeighbours(List<Node> neighbours) {
     neighbours.forEach(n -> {
-      if (!visitedEscapeTiles.contains(n.getId())) { unvisitedEscapeNodes.add(n); } } );
-      return unvisitedEscapeNodes;
+      if (!visitedEscapeTiles.contains(n.getId())) { 
+        unvisitedEscapeNodes.add(n); 
+      }
+     } );
+     return unvisitedEscapeNodes;
   }
 }
